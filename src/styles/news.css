@@ -1,0 +1,51 @@
+.landing-new__news-card--skeleton .landing-new__news-skeleton-image {
+    width: 100%;
+    padding-top: 56.25%;
+    background: var(--skeleton-bg);
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.landing-new__news-skeleton-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            transparent 100%);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.landing-new__empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.landing-new__empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.landing-new__empty-state h3 {
+    color: var(--text-color);
+    margin: 0 0 0.5rem;
+}
+
+.landing-new__empty-state p {
+    color: var(--text-muted);
+    margin: 0;
+}

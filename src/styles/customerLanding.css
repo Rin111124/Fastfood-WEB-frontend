@@ -1,0 +1,532 @@
+:root {
+  --customer-bg: #f8fafc;
+  --customer-gradient: linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+  --customer-surface: rgba(255, 255, 255, 0.94);
+  --customer-text: #0f172a;
+  --customer-muted: #475569;
+  --customer-border: rgba(15, 23, 42, 0.12);
+  --customer-accent: #2563eb;
+  --customer-accent-dark: #1d4ed8;
+  --customer-accent-light: rgba(37, 99, 235, 0.12);
+  --customer-danger: #dc2626;
+  --customer-success: #059669;
+  --customer-info: #0284c7;
+  --customer-radius: 18px;
+  --customer-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+}
+
+.customer-page {
+  min-height: 100vh;
+  background: var(--customer-gradient);
+  color: var(--customer-text);
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-taskbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--customer-surface);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.customer-taskbar__layout {
+  width: min(1120px, 92vw);
+  margin: 0 auto;
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.customer-taskbar__brand {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--customer-accent);
+}
+
+.customer-taskbar__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.customer-taskbar__link {
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--customer-muted);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.customer-taskbar__link:hover {
+  color: var(--customer-accent);
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.customer-taskbar__link.is-active {
+  background: var(--customer-accent);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+}
+
+.customer-taskbar__meta {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.customer-taskbar__back {
+  width: 2.5rem;
+  padding: 0.45rem;
+  justify-content: center;
+}
+
+.customer-taskbar__back span {
+  font-size: 1.1rem;
+}
+
+.customer-taskbar__user {
+  font-weight: 600;
+  color: var(--customer-text);
+}
+
+.customer-taskbar__refresh {
+  min-width: 7.5rem;
+}
+
+.customer-content {
+  width: min(1120px, 92vw);
+  margin: 2.5rem auto 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.customer-status {
+  border-radius: var(--customer-radius);
+  padding: 1rem 1.25rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.customer-status--info {
+  background: rgba(2, 132, 199, 0.1);
+  border-color: rgba(2, 132, 199, 0.26);
+  color: var(--customer-info);
+}
+
+.customer-status--success {
+  background: rgba(5, 150, 105, 0.12);
+  border-color: rgba(5, 150, 105, 0.24);
+  color: var(--customer-success);
+}
+
+.customer-status--error {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.32);
+  color: var(--customer-danger);
+}
+
+.customer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.customer-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.customer-section__eyebrow {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--customer-muted);
+  margin-bottom: 0.35rem;
+}
+
+.customer-section__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.customer-section__subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--customer-muted);
+  max-width: 52ch;
+}
+
+.customer-section__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.customer-placeholder {
+  padding: 1.1rem 1.4rem;
+  border-radius: var(--customer-radius);
+  border: 1px dashed var(--customer-border);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--customer-muted);
+  text-align: center;
+}
+
+.customer-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.customer-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: var(--customer-radius);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: var(--customer-shadow);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.customer-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.customer-card__title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.customer-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--customer-accent-light);
+  color: var(--customer-accent-dark);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.customer-chip--success {
+  background: rgba(5, 150, 105, 0.14);
+  color: var(--customer-success);
+}
+
+.customer-definition {
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.customer-definition__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
+}
+
+.customer-definition__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.customer-definition__row dt {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--customer-muted);
+}
+
+.customer-definition__row dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--customer-text);
+  text-align: right;
+  white-space: pre-wrap;
+}
+
+.customer-card--activity {
+  justify-content: space-between;
+}
+
+.customer-activity__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.customer-activity__action {
+  margin: 0;
+  font-weight: 700;
+  color: var(--customer-text);
+}
+
+.customer-activity__time {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--customer-muted);
+}
+
+.customer-activity__summary {
+  margin: 0;
+  color: var(--customer-muted);
+}
+
+.customer-empty {
+  margin: 0;
+  color: var(--customer-muted);
+  text-align: center;
+}
+
+.customer-note {
+  margin: 0;
+  color: var(--customer-muted);
+  line-height: 1.5;
+}
+
+.customer-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--customer-text);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.customer-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.customer-btn:focus-visible,
+.customer-taskbar__link:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+.customer-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.customer-btn--primary {
+  background: var(--customer-accent);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+}
+
+.customer-btn--primary:hover:not(:disabled) {
+  background: var(--customer-accent-dark);
+}
+
+.customer-btn--ghost {
+  border-color: var(--customer-border);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--customer-text);
+}
+
+.customer-btn--ghost:hover:not(:disabled) {
+  border-color: var(--customer-accent);
+  color: var(--customer-accent-dark);
+}
+
+.customer-btn--danger {
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.22);
+  color: var(--customer-danger);
+}
+
+.customer-btn--danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: var(--customer-danger);
+}
+
+.customer-card--form {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.customer-form__fields {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.customer-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.customer-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.customer-form__field label {
+  font-weight: 600;
+  color: var(--customer-muted);
+  font-size: 0.9rem;
+}
+
+.customer-form__field input,
+.customer-form__field select,
+.customer-form__field textarea {
+  border-radius: 12px;
+  border: 1px solid var(--customer-border);
+  background: #fff;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--customer-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.customer-form__field input:focus,
+.customer-form__field select:focus,
+.customer-form__field textarea:focus {
+  outline: none;
+  border-color: var(--customer-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.customer-form__field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.customer-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.customer-card--history {
+  gap: 1.25rem;
+}
+
+.customer-history__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.customer-history__item {
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(248, 250, 252, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.customer-history__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.85rem;
+  color: var(--customer-muted);
+  font-weight: 600;
+}
+
+.customer-history__action {
+  color: var(--customer-text);
+}
+
+.customer-history__time {
+  color: var(--customer-muted);
+}
+
+.customer-history__summary {
+  margin: 0;
+  color: var(--customer-muted);
+}
+
+@media (max-width: 960px) {
+  .customer-section__title {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .customer-taskbar__layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .customer-taskbar__meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .customer-content {
+    margin-top: 2rem;
+    gap: 2rem;
+  }
+
+  .customer-card {
+    padding: 1.35rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .customer-taskbar__nav {
+    width: 100%;
+  }
+
+  .customer-taskbar__link {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .customer-section__actions {
+    width: 100%;
+  }
+
+  .customer-btn {
+    width: 100%;
+  }
+
+  .customer-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
