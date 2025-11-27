@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
-import { login } from '../../services/authService'
+import { login, resendVerificationEmail } from '../../services/authService'
 import { persistSession } from '../../lib/session'
 import ReCAPTCHA from 'react-google-recaptcha'
 
@@ -18,6 +18,8 @@ const Login = () => {
     status: 'idle',
     message: '',
   })
+  const [verificationNotice, setVerificationNotice] = useState('')
+  const [resendStatus, setResendStatus] = useState({ status: 'idle', message: '' })
 
   const [fieldErrors, setFieldErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
@@ -58,6 +60,8 @@ const Login = () => {
     event.preventDefault()
     setFeedback({ status: 'idle', message: '' })
     setFieldErrors({})
+    setVerificationNotice('')
+    setResendStatus({ status: 'idle', message: '' })
 
     const usernameValue = form.username.trim()
     const passwordValue = form.password.trim()
@@ -119,6 +123,12 @@ const Login = () => {
         setCaptchaToken('')
       }
 
+      if (error.emailNotVerified) {
+        setVerificationNotice('Tai khoan chua duoc xac thuc email. Kiem tra hop thu hoac gui lai lien ket xac thuc.')
+      } else {
+        setVerificationNotice('')
+      }
+
       setFeedback({
         status: 'error',
         message:
@@ -129,6 +139,35 @@ const Login = () => {
       setFieldErrors(error.fieldErrors || {})
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    const identifier = form.username.trim()
+    if (!identifier) {
+      setResendStatus({
+        status: 'error',
+        message: 'Nhap email hoac ten dang nhap de gui lai lien ket xac thuc.',
+      })
+      return
+    }
+
+    setResendStatus({ status: 'loading', message: 'Dang gui lai email xac thuc...' })
+    try {
+      await resendVerificationEmail({ identifier })
+      setResendStatus({
+        status: 'success',
+        message: 'Neu thong tin hop le, chung toi da gui lai email xac thuc.',
+      })
+    } catch (error) {
+      const retryText =
+        typeof error.retryAfterSeconds === 'number' && error.retryAfterSeconds > 0
+          ? ` Thu lai sau ${Math.ceil(error.retryAfterSeconds)} giay.`
+          : ''
+      setResendStatus({
+        status: 'error',
+        message: `${error.message || 'Khong the gui lai email xac thuc.'}${retryText}`,
+      })
     }
   }
 
@@ -277,6 +316,32 @@ const Login = () => {
             role="alert"
           >
             {feedback.message}
+          </div>
+        )}
+
+        {verificationNotice && (
+          <div className="alert alert-warning border-0 py-3 px-4">
+            <div className="d-flex flex-column gap-2">
+              <span>{verificationNotice}</span>
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                <button
+                  type="button"
+                  className="btn btn-outline-warning btn-sm"
+                  onClick={handleResendVerification}
+                  disabled={resendStatus.status === 'loading'}
+                >
+                  {resendStatus.status === 'loading' ? 'Dang gui...' : 'Gui lai email xac thuc'}
+                </button>
+                <Link className="btn btn-link btn-sm p-0 align-baseline" to="/verify-email">
+                  Nhap ma xac thuc thu cong
+                </Link>
+              </div>
+              {resendStatus.message && (
+                <small className={resendStatus.status === 'error' ? 'text-danger' : 'text-success'}>
+                  {resendStatus.message}
+                </small>
+              )}
+            </div>
           </div>
         )}
 

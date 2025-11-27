@@ -68,6 +68,12 @@ export const login = async ({ username, password, captchaToken }) => {
     if (typeof body?.retryAfterSeconds === 'number') {
       error.retryAfterSeconds = body.retryAfterSeconds
     }
+    if (body?.code) {
+      error.code = body.code
+    }
+    if (body?.code === 'EMAIL_NOT_VERIFIED') {
+      error.emailNotVerified = true
+    }
     error.status = response.status
     throw error
   }
@@ -174,9 +180,6 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
 
   const registeredUser = data.user
   return {
-    token: data.accessToken,
-    tokenType: data.tokenType || 'Bearer',
-    expiresIn: data.expiresIn,
     user: {
       id: registeredUser.user_id,
       username: registeredUser.username,
@@ -185,6 +188,8 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
       name: normalizeName(registeredUser.full_name || registeredUser.username, fullName),
       raw: registeredUser,
     },
+    requiresEmailVerification: Boolean(data?.requiresEmailVerification),
+    emailVerification: data?.emailVerification,
   }
 }
 
@@ -255,4 +260,75 @@ export const resetPassword = async ({ token, password }) => {
   }
 
   return { success: true }
+}
+
+export const verifyEmail = async ({ token }) => {
+  if (!token) {
+    throw new Error('Missing verification token.')
+  }
+
+  let response
+  let body
+  try {
+    const result = await requestJson('/api/auth/verify-email', { token })
+    response = result.response
+    body = result.body
+  } catch (networkError) {
+    console.error('Email verification request failed', networkError)
+    throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
+  }
+
+  if (!response.ok) {
+    const message =
+      body?.message ||
+      (response.status >= 500
+        ? 'Verification services are temporarily unavailable. Please try again shortly.'
+        : 'Unable to verify your email. The link may have expired.')
+    const error = new Error(message)
+    if (body?.code) {
+      error.code = body.code
+    }
+    if (body?.errors && typeof body.errors === 'object') {
+      error.fieldErrors = body.errors
+    }
+    error.status = response.status
+    throw error
+  }
+
+  return body?.data || { verified: true }
+}
+
+export const resendVerificationEmail = async ({ identifier }) => {
+  let response
+  let body
+  try {
+    const result = await requestJson('/api/auth/resend-verification', { identifier })
+    response = result.response
+    body = result.body
+  } catch (networkError) {
+    console.error('Resend verification request failed', networkError)
+    throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
+  }
+
+  if (!response.ok) {
+    const message =
+      body?.message ||
+      (response.status >= 500
+        ? 'Verification services are temporarily unavailable. Please try again shortly.'
+        : 'Unable to resend the verification email.')
+    const error = new Error(message)
+    if (body?.errors && typeof body.errors === 'object') {
+      error.fieldErrors = body.errors
+    }
+    if (typeof body?.retryAfterSeconds === 'number') {
+      error.retryAfterSeconds = body.retryAfterSeconds
+    }
+    if (body?.code) {
+      error.code = body.code
+    }
+    error.status = response.status
+    throw error
+  }
+
+  return body?.data || { sent: true }
 }

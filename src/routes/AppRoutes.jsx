@@ -36,6 +36,7 @@ import VnpayCheckout from '../features/customer/pages/VnpayCheckout'
 import PaypalCheckout from '../features/customer/pages/PaypalCheckout'
 import ForgotPassword from '../components/Auth/ForgotPassword'
 import ResetPassword from '../components/Auth/ResetPassword'
+import VerifyEmail from '../components/Auth/VerifyEmail'
 
 const AppRoutes = () => (
   <Routes>
@@ -48,6 +49,7 @@ const AppRoutes = () => (
     <Route path="/signup" element={<Signup />} />
     <Route path="/forgot-password" element={<ForgotPassword />} />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/verify-email" element={<VerifyEmail />} />
 
     <Route element={<ProtectedRoute allowRoles={['customer', 'staff', 'admin', 'shipper']} />}>
       <Route path="/dashboard" element={<Dashboard />} />

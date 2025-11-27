@@ -181,9 +181,12 @@ const Signup = () => {
         captchaToken,
       })
       const contactName = response?.user?.name ?? fullNameValue
+      const emailText = response?.user?.email || emailValue
+      const verificationUrl = response?.emailVerification?.verifyUrl
       setFeedback({
         status: 'success',
-        message: `Welcome aboard, ${contactName}! Our onboarding team will help you open doors and sync your menus within minutes.`,
+        message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.` +
+          (verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''),
       })
       setFieldErrors({})
       setTimeout(() => {
