@@ -76,7 +76,7 @@ const ForgotPassword = () => {
           'Khong tiet lo tai khoan ton tai hay khong',
           'Nho kiem tra ca thu Spam/Quang cao',
         ],
-        footnote: 'Mat khau moi can toi thieu 12 ky tu voi chu hoa, chu thuong, so va ky tu dac biet.',
+        footnote: 'Mat khau moi can toi thieu 8 ky tu va nen co chu hoa, so, ky tu dac biet.',
       }}
     >
       <div className="mb-4">
