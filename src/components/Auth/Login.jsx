@@ -70,8 +70,8 @@ const Login = () => {
 
     if (!passwordValue) {
       clientErrors.password = 'Vui long nhap mat khau'
-    } else if (passwordValue.length < 12) {
-      clientErrors.password = 'Mat khau phai co it nhat 12 ky tu'
+    } else if (passwordValue.length < 8) {
+      clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
     }
 
     if (showCaptcha && !captchaToken) {
@@ -202,11 +202,11 @@ const Login = () => {
             value={form.password}
             onChange={handleChange}
             required
-            minLength={12}
+            minLength={8}
           />
           {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
           <div className="form-text small text-secondary">
-            Mat khau can toi thieu 12 ky tu, co chu hoa, chu thuong, so va ky tu dac biet.
+            Mat khau can toi thieu 8 ky tu.
           </div>
         </div>
 

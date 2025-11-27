@@ -127,8 +127,8 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
     throw new Error('All fields are required so we can prep your QuickBite workspace.')
   }
 
-  if (password.length < 12) {
-    throw new Error('Passwords need at least 12 characters with mixed complexity to keep accounts secure.')
+  if (password.length < 8) {
+    throw new Error('Passwords need at least 8 characters.')
   }
 
   let response
