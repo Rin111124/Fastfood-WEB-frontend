@@ -1,3 +1,5 @@
+import apiFetch from './apiClient'
+
 const normalizeName = (value = '', fallback = 'Team member') => {
   if (!value || !value.trim()) return fallback
   return value
@@ -6,13 +8,6 @@ const normalizeName = (value = '', fallback = 'Team member') => {
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
     .join(' ')
 }
-
-const API_BASE_URL = (() => {
-  const base = import.meta.env.VITE_API_BASE_URL || 'https://fastfood-web-backend-production.up.railway.app'
-  return base.endsWith('/') ? base.slice(0, -1) : base
-})()
-
-const API_TIMEOUT_MS = Number(import.meta.env.VITE_API_TIMEOUT_MS || 10000)
 
 const parseJsonSafely = async (response) => {
   try {
@@ -23,24 +18,19 @@ const parseJsonSafely = async (response) => {
   }
 }
 
-const fetchWithTimeout = async (url, options = {}, timeout = API_TIMEOUT_MS) => {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeout)
-
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal })
-    return response
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new Error('The QuickBite API took too long to respond. Please try again.')
-    }
-    throw error
-  } finally {
-    clearTimeout(timer)
-  }
+const requestJson = async (path, payload, method = 'POST') => {
+  const response = await apiFetch(path, {
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  const body = await parseJsonSafely(response)
+  return { response, body }
 }
 
-export const login = async ({ username, password }) => {
+export const login = async ({ username, password, captchaToken }) => {
   if (!username || !password) {
     throw new Error('Username and password are required to access the kitchen dashboard.')
   }
@@ -48,23 +38,20 @@ export const login = async ({ username, password }) => {
   const payload = {
     identifier: username,
     password,
+    ...(captchaToken ? { captchaToken } : {}),
   }
 
   let response
+  let body
   try {
-    response = await fetchWithTimeout(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+    const result = await requestJson('/api/auth/login', payload)
+    response = result.response
+    body = result.body
   } catch (networkError) {
     console.error('Login request failed', networkError)
     throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
   }
 
-  const body = await parseJsonSafely(response)
   if (!response.ok) {
     const message =
       body?.message ||
@@ -75,6 +62,13 @@ export const login = async ({ username, password }) => {
     if (body?.errors && typeof body.errors === 'object') {
       error.fieldErrors = body.errors
     }
+    if (body?.requireCaptcha) {
+      error.requireCaptcha = true
+    }
+    if (typeof body?.retryAfterSeconds === 'number') {
+      error.retryAfterSeconds = body.retryAfterSeconds
+    }
+    error.status = response.status
     throw error
   }
 
@@ -125,7 +119,7 @@ const mapGenderForApi = (gender) => {
 const mapRoleForApi = (role) => {
   if (!role) return 'customer'
   const normalized = role.trim().toLowerCase()
-  return ['customer', 'staff'].includes(normalized) ? normalized : 'customer'
+  return ['customer', 'guest', 'staff'].includes(normalized) ? normalized : 'customer'
 }
 
 export const signup = async ({ username, password, fullName, email, phoneNumber, gender, role }) => {
@@ -133,33 +127,29 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
     throw new Error('All fields are required so we can prep your QuickBite workspace.')
   }
 
-  if (password.length < 8) {
-    throw new Error('Passwords need at least 8 characters to keep accounts secure.')
+  if (password.length < 12) {
+    throw new Error('Passwords need at least 12 characters with mixed complexity to keep accounts secure.')
   }
 
   let response
+  let body
   try {
-    response = await fetchWithTimeout(`${API_BASE_URL}/api/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-        fullName,
-        phoneNumber,
-        gender: mapGenderForApi(gender),
-        role: mapRoleForApi(role),
-      }),
+    const result = await requestJson('/api/auth/signup', {
+      username,
+      password,
+      email,
+      fullName,
+      phoneNumber,
+      gender: mapGenderForApi(gender),
+      role: mapRoleForApi(role),
     })
+    response = result.response
+    body = result.body
   } catch (networkError) {
     console.error('Signup request failed', networkError)
     throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
   }
 
-  const body = await parseJsonSafely(response)
   if (!response.ok) {
     const message =
       body?.message ||
@@ -192,4 +182,73 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
       raw: registeredUser,
     },
   }
+}
+
+export const requestPasswordReset = async ({ identifier, captchaToken }) => {
+  const payload = {
+    identifier,
+    ...(captchaToken ? { captchaToken } : {}),
+  }
+
+  let response
+  let body
+  try {
+    const result = await requestJson('/api/auth/forgot-password', payload)
+    response = result.response
+    body = result.body
+  } catch (networkError) {
+    console.error('Forgot password request failed', networkError)
+    throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
+  }
+
+  if (!response.ok) {
+    const message =
+      body?.message ||
+      (response.status >= 500
+        ? 'Reset services are temporarily unavailable. Please try again shortly.'
+        : 'Unable to process your reset request. Please verify your details.')
+    const error = new Error(message)
+    if (body?.errors && typeof body.errors === 'object') {
+      error.fieldErrors = body.errors
+    }
+    if (typeof body?.retryAfterSeconds === 'number') {
+      error.retryAfterSeconds = body.retryAfterSeconds
+    }
+    throw error
+  }
+
+  return {
+    success: true,
+    requireCaptcha: Boolean(body?.requireCaptcha),
+    token: body?.token,
+    resetUrl: body?.resetUrl,
+  }
+}
+
+export const resetPassword = async ({ token, password }) => {
+  let response
+  let body
+  try {
+    const result = await requestJson('/api/auth/reset-password', { token, password })
+    response = result.response
+    body = result.body
+  } catch (networkError) {
+    console.error('Reset password request failed', networkError)
+    throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
+  }
+
+  if (!response.ok) {
+    const message =
+      body?.message ||
+      (response.status >= 500
+        ? 'Reset services are temporarily unavailable. Please try again shortly.'
+        : 'Unable to reset your password. Please verify your token and try again.')
+    const error = new Error(message)
+    if (body?.errors && typeof body.errors === 'object') {
+      error.fieldErrors = body.errors
+    }
+    throw error
+  }
+
+  return { success: true }
 }

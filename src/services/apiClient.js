@@ -14,7 +14,7 @@ const resolveBaseUrl = () => {
   // Priority 2: env variable (ALWAYS use if set)
   const envValue = import.meta?.env?.VITE_API_BASE_URL
   if (envValue && envValue.trim()) {
-    console.log('🚀 Using VITE_API_BASE_URL:', envValue)
+    console.log('[apiClient] Using VITE_API_BASE_URL:', envValue)
     return trimTrailingSlashes(envValue)
   }
 
@@ -27,7 +27,7 @@ const resolveBaseUrl = () => {
 
     if (isLocalHost && DEV_SERVER_PORTS.has(normalizedPort)) {
       const guessedOrigin = `${protocol}//${normalizedHost}:${FALLBACK_DEV_BACKEND_PORT}`
-      console.log('⚠️ No VITE_API_BASE_URL, using localhost:', guessedOrigin)
+      console.log('[apiClient] No VITE_API_BASE_URL, using localhost:', guessedOrigin)
       return trimTrailingSlashes(guessedOrigin)
     }
 
@@ -49,6 +49,46 @@ const buildUrl = (input) => {
     return `${API_BASE_URL}${input}`
   }
   return `${API_BASE_URL}/${input}`
+}
+
+const API_URL_OBJECT = (() => {
+  try {
+    return new URL(API_BASE_URL)
+  } catch {
+    return null
+  }
+})()
+
+const resolveApiKey = () => {
+  if (typeof window !== 'undefined') {
+    const runtimeKey = window.__API_KEY__ || window.__KONG_API_KEY__
+    if (runtimeKey && String(runtimeKey).trim()) {
+      return String(runtimeKey).trim()
+    }
+  }
+
+  const envKey = import.meta?.env?.VITE_KONG_API_KEY || import.meta?.env?.VITE_API_KEY
+  if (envKey && String(envKey).trim()) {
+    return String(envKey).trim()
+  }
+
+  return ''
+}
+
+const API_KEY = resolveApiKey()
+if (typeof window !== 'undefined') {
+  console.log('[apiClient] Base URL:', API_BASE_URL)
+  console.log('[apiClient] API key present:', API_KEY ? 'yes' : 'no')
+}
+
+const shouldAttachApiKey = (targetUrl) => {
+  if (!API_KEY || !API_URL_OBJECT) return false
+  try {
+    const parsed = new URL(targetUrl)
+    return parsed.host === API_URL_OBJECT.host
+  } catch {
+    return false
+  }
 }
 
 export const resolveAssetUrl = (input) => {
@@ -128,28 +168,28 @@ const shouldRetry = (error, retryCount) => {
 const getErrorMessage = (error, retryCount) => {
   // Handle authentication errors
   if (error.status === 401) {
-    return 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+    return 'Phien dang nhap het han. Vui long dang nhap lai.'
   }
 
   // Handle network/connection errors
   if (!error.status || error.name === 'TypeError') {
     return retryCount >= CONFIG.MAX_RETRIES
-      ? 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.'
-      : 'Đang thử kết nối lại với máy chủ...'
+      ? 'Khong the ket noi den may chu. Vui long kiem tra ket noi mang va thu lai.'
+      : 'Dang thu ket noi lai voi may chu...'
   }
 
   // Handle ECONNREFUSED
   if (error.message?.includes('ECONNREFUSED')) {
     return retryCount >= CONFIG.MAX_RETRIES
-      ? 'Máy chủ không phản hồi. Vui lòng thử lại sau.'
-      : 'Đang chờ máy chủ phản hồi...'
+      ? 'May chu khong phan hoi. Vui long thu lai sau.'
+      : 'Dang cho may chu phan hoi...'
   }
 
   // Handle server errors
   if (error.status >= 500) {
     return retryCount >= CONFIG.MAX_RETRIES
-      ? `Máy chủ tạm thời không phản hồi. Đã thử lại ${CONFIG.MAX_RETRIES} lần không thành công.`
-      : 'Máy chủ đang gặp sự cố, đang thử lại...'
+      ? `May chu tam thoi khong phan hoi. Da thu lai ${CONFIG.MAX_RETRIES} lan khong thanh cong.`
+      : 'May chu dang gap su co, dang thu lai...'
   }
 
   // Handle specific error messages from server
@@ -158,7 +198,7 @@ const getErrorMessage = (error, retryCount) => {
   }
 
   // Default error message
-  return 'Có lỗi xảy ra. Vui lòng thử lại sau.'
+  return 'Co loi xay ra. Vui long thu lai sau.'
 }
 
 const apiFetch = async (input, init = {}, retryCount = 0) => {
@@ -168,6 +208,10 @@ const apiFetch = async (input, init = {}, retryCount = 0) => {
 
   if (session?.token && !headers.has('Authorization')) {
     headers.set('Authorization', `${session.tokenType || 'Bearer'} ${session.token}`)
+  }
+
+  if (API_KEY && shouldAttachApiKey(url) && !headers.has('apikey')) {
+    headers.set('apikey', API_KEY)
   }
 
   // Ensure common headers are set
@@ -187,7 +231,7 @@ const apiFetch = async (input, init = {}, retryCount = 0) => {
   }
 
   try {
-    console.log(`🔄 [${retryCount + 1}/${CONFIG.MAX_RETRIES + 1}] ${init.method || 'GET'} ${url}`)
+    console.log(`[apiClient] [${retryCount + 1}/${CONFIG.MAX_RETRIES + 1}] ${init.method || 'GET'} ${url}`)
 
     const response = await Promise.race([
       fetch(url, {
@@ -198,7 +242,7 @@ const apiFetch = async (input, init = {}, retryCount = 0) => {
     ])
 
     // Log response details
-    console.log(`📡 Response:`, {
+    console.log('[apiClient] Response:', {
       url,
       status: response.status,
       ok: response.ok,
@@ -230,7 +274,7 @@ const apiFetch = async (input, init = {}, retryCount = 0) => {
 
     if (shouldRetry(apiError, retryCount)) {
       const backoff = calculateBackoff(retryCount)
-      console.log(`⚠️ Attempt ${retryCount + 1} failed, retrying in ${backoff}ms...`, {
+      console.log(`[apiClient] Attempt ${retryCount + 1} failed, retrying in ${backoff}ms...`, {
         error: apiError.message,
         status: apiError.status,
         retryCount

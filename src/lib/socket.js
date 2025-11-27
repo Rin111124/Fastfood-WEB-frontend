@@ -27,7 +27,9 @@ const ensureLatestAuth = (s) => {
     const session = readSession()
     // socket.io-client v4 allows updating auth before connect/reconnect
     s.auth = session?.token ? { token: session.token } : undefined
-  } catch { }
+  } catch (err) {
+    console.warn('Failed to refresh socket auth', err)
+  }
 }
 
 const getSocket = () => {

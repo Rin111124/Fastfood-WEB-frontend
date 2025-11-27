@@ -187,7 +187,11 @@ export async function routeDriving(origin, destination, { allowApproximate = tru
   if (!origin || !destination) throw new Error('Missing coordinates')
   // Try primary OSRM
   let res1 = null
-  try { res1 = await fetchOSRM(OSRM_PRIMARY, origin, destination) } catch {}
+  try {
+    res1 = await fetchOSRM(OSRM_PRIMARY, origin, destination)
+  } catch (err) {
+    console.warn('OSRM primary failed', err)
+  }
   if (res1?.ok) {
     return {
       distance_m: Number(res1.route.distance) || 0,
@@ -197,7 +201,11 @@ export async function routeDriving(origin, destination, { allowApproximate = tru
   }
   // Try backup OSRM
   let res2 = null
-  try { res2 = await fetchOSRM(OSRM_BACKUP, origin, destination) } catch {}
+  try {
+    res2 = await fetchOSRM(OSRM_BACKUP, origin, destination)
+  } catch (err) {
+    console.warn('OSRM backup failed', err)
+  }
   if (res2?.ok) {
     return {
       distance_m: Number(res2.route.distance) || 0,
@@ -231,10 +239,14 @@ export async function nearestDriving(point) {
   try {
     const p = await osrmNearest(OSRM_PRIMARY, point)
     if (p) return p
-  } catch {}
+  } catch (err) {
+    console.warn('OSRM primary nearest failed', err)
+  }
   try {
     const p2 = await osrmNearest(OSRM_BACKUP, point)
     if (p2) return p2
-  } catch {}
+  } catch (err) {
+    console.warn('OSRM backup nearest failed', err)
+  }
   return null
 }

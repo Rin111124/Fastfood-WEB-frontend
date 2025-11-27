@@ -121,7 +121,9 @@ const StaffSupport = () => {
                         const s = connectSocket()
                         s.emit('support:typing', { user_id: message.user_id, typing: true })
                         setTimeout(() => s.emit('support:typing', { user_id: message.user_id, typing: false }), 1200)
-                      } catch {}
+                      } catch (err) {
+                        console.warn('Failed to emit support typing status', err)
+                      }
                     }}
                   />
                   <div className="d-flex justify-content-end gap-2">

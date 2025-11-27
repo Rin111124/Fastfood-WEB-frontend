@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { login } from '../../services/authService'
 import { persistSession } from '../../lib/session'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -11,6 +12,8 @@ const Login = () => {
     remember: false,
   })
 
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [showCaptcha, setShowCaptcha] = useState(false)
   const [feedback, setFeedback] = useState({
     status: 'idle',
     message: '',
@@ -19,6 +22,7 @@ const Login = () => {
   const [fieldErrors, setFieldErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const siteKey = useMemo(() => (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim(), [])
 
   const handleChange = (event) => {
     const { name, type, checked, value } = event.target
@@ -66,8 +70,12 @@ const Login = () => {
 
     if (!passwordValue) {
       clientErrors.password = 'Vui long nhap mat khau'
-    } else if (passwordValue.length < 8) {
-      clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
+    } else if (passwordValue.length < 12) {
+      clientErrors.password = 'Mat khau phai co it nhat 12 ky tu'
+    }
+
+    if (showCaptcha && !captchaToken) {
+      clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA truoc khi dang nhap'
     }
 
     if (Object.keys(clientErrors).length) {
@@ -86,6 +94,7 @@ const Login = () => {
         username: usernameValue,
         password: passwordValue,
         remember: form.remember,
+        captchaToken: showCaptcha ? captchaToken : undefined,
       })
       const crewLead = response?.user?.name ?? 'Team member'
       persistSession(response, form.remember)
@@ -105,9 +114,17 @@ const Login = () => {
       }
       navigate(destination, { replace: true, state: response })
     } catch (error) {
+      if (error.requireCaptcha) {
+        setShowCaptcha(true)
+        setCaptchaToken('')
+      }
+
       setFeedback({
         status: 'error',
-        message: error.message || 'Unable to sign in right now. Please double-check your username and password.',
+        message:
+          error.retryAfterSeconds && error.retryAfterSeconds > 0
+            ? `${error.message} (Thu lai sau ${Math.ceil(error.retryAfterSeconds)} giay)`
+            : error.message || 'Unable to sign in right now. Please double-check your username and password.',
       })
       setFieldErrors(error.fieldErrors || {})
     } finally {
@@ -172,9 +189,9 @@ const Login = () => {
             <label className="form-label mb-0" htmlFor="loginPassword">
               Password
             </label>
-            <button type="button" className="btn btn-link p-0 auth-link fw-semibold">
+            <Link to="/forgot-password" className="btn btn-link p-0 auth-link fw-semibold">
               Reset access
-            </button>
+            </Link>
           </div>
           <input
             id="loginPassword"
@@ -185,9 +202,12 @@ const Login = () => {
             value={form.password}
             onChange={handleChange}
             required
-            minLength={8}
+            minLength={12}
           />
           {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
+          <div className="form-text small text-secondary">
+            Mat khau can toi thieu 12 ky tu, co chu hoa, chu thuong, so va ky tu dac biet.
+          </div>
         </div>
 
         <div className="d-flex align-items-center justify-content-between mb-4">
@@ -206,6 +226,49 @@ const Login = () => {
           </div>
           <span className="small text-secondary">Delivery lanes sync every 30 seconds</span>
         </div>
+
+        {showCaptcha && (
+          <div className="mb-4">
+            <label className="form-label" htmlFor="captchaToken">
+              CAPTCHA
+            </label>
+            {siteKey ? (
+              <div className="d-flex flex-column gap-2">
+                <ReCAPTCHA
+                  sitekey={siteKey}
+                  onChange={(token) => {
+                    setCaptchaToken(token || '')
+                    setFieldErrors((prev) => {
+                      if (!prev.captchaToken) return prev
+                      const next = { ...prev }
+                      delete next.captchaToken
+                      return next
+                    })
+                  }}
+                  onExpired={() => setCaptchaToken('')}
+                />
+                {fieldErrors.captchaToken && <div className="text-danger small">{fieldErrors.captchaToken}</div>}
+              </div>
+            ) : (
+              <>
+                <input
+                  id="captchaToken"
+                  name="captchaToken"
+                  type="text"
+                  className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
+                  placeholder="Nhap ma CAPTCHA"
+                  value={captchaToken}
+                  onChange={(event) => setCaptchaToken(event.target.value)}
+                  required
+                />
+                <div className="form-text small text-secondary">
+                  Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+                </div>
+                {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
+              </>
+            )}
+          </div>
+        )}
 
         {feedback.status !== 'idle' && (
           <div

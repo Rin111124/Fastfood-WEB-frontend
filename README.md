@@ -15,9 +15,12 @@ The dev server runs on `http://localhost:5173`. Configure the backend base URL t
 ```
 VITE_API_BASE_URL=http://localhost:3000
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+VITE_KONG_API_KEY=<kong-apikey-if-your-api-is-behind-kong>
 ```
 
 You can tweak the request timeout with `VITE_API_TIMEOUT_MS`.
+
+When `VITE_KONG_API_KEY` is set, the frontend sends it in the `apikey` header (not in the URL) to avoid leaking the key through query strings or referrers. Leave it blank for public builds and prefer issuing gateway keys only to trusted clients.
 
 ## Highlights
 

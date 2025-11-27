@@ -58,7 +58,9 @@ const MapPicker = ({
       mounted = false
       try {
         mapObjRef.current && mapObjRef.current.remove()
-      } catch {}
+      } catch (err) {
+        console.warn('Failed to dispose map instance', err)
+      }
     }
   }, [])
 
@@ -71,4 +73,3 @@ const MapPicker = ({
 }
 
 export default MapPicker
-

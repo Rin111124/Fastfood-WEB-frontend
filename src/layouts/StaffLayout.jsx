@@ -67,7 +67,9 @@ const StaffLayout = () => {
       try {
         const data = await staffApi.getSupportMetrics()
         setSupportUnreplied(Number(data?.unrepliedCount || 0))
-      } catch {}
+      } catch (err) {
+        console.warn('Failed to load support metrics', err)
+      }
     }
     fetchMetrics()
     const socket = connectSocket()

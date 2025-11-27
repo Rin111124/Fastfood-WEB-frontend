@@ -11,7 +11,7 @@ const Signup = () => {
     email: '',
     phoneNumber: '',
     gender: '',
-    role: 'staff',
+    role: 'customer',
     agree: false,
   })
 
@@ -106,10 +106,14 @@ const Signup = () => {
 
     if (!passwordValue) {
       clientErrors.password = 'Vui long nhap mat khau'
-    } else if (passwordValue.length < 8) {
-      clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
+    } else if (passwordValue.length < 12) {
+      clientErrors.password = 'Mat khau phai co it nhat 12 ky tu'
     } else if (passwordValue.length > 255) {
       clientErrors.password = 'Mat khau khong duoc vuot qua 255 ky tu'
+    } else if (!/[A-Z]/.test(passwordValue) || !/[a-z]/.test(passwordValue) || !/[0-9]/.test(passwordValue) || !/[^A-Za-z0-9]/.test(passwordValue)) {
+      clientErrors.password = 'Can chu hoa, chu thuong, so va ky tu dac biet'
+    } else if (/(.)\1{3,}/.test(passwordValue)) {
+      clientErrors.password = 'Khong lap lai 1 ky tu qua 4 lan'
     }
 
     if (!fullNameValue) {
@@ -243,18 +247,21 @@ const Signup = () => {
             <label className="form-label" htmlFor="password">
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
-              placeholder="Create a secure passphrase"
-              minLength={8}
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
+          <input
+            id="password"
+            name="password"
+            type="password"
+            className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
+            placeholder="Create a secure passphrase"
+            minLength={12}
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
+          <div className="form-text small text-secondary">
+            Can toi thieu 12 ky tu, gom chu hoa, chu thuong, so va ky tu dac biet.
+          </div>
           </div>
 
           <div className="col-12 col-md-6">
@@ -343,8 +350,8 @@ const Signup = () => {
               onChange={handleChange}
               required
             >
-              <option value="staff">Staff</option>
               <option value="customer">Customer</option>
+              <option value="guest">Guest</option>
             </select>
             {fieldErrors.role && <div className="invalid-feedback d-block">{fieldErrors.role}</div>}
           </div>

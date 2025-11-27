@@ -207,7 +207,9 @@ const CartPage = () => {
   useEffect(() => {
     // when switching to delivery, try resolving store coords once
     if (method === 'delivery') {
-      ensureStoreCoords().catch(() => { })
+      ensureStoreCoords().catch((err) => {
+        console.warn('Failed to resolve store coordinates', err)
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method])
@@ -237,7 +239,9 @@ const CartPage = () => {
         if (addr && addressSource === 'profile') {
           setAddress(addr)
         }
-      } catch { }
+      } catch (err) {
+        console.warn('Failed to load profile address', err)
+      }
     }
     if (isAuthenticated) loadProfile()
     return () => {
@@ -262,7 +266,9 @@ const CartPage = () => {
       .then((geo) => {
         if (geo) computeDistanceTo(geo.lat, geo.lon)
       })
-      .catch(() => { })
+      .catch((err) => {
+        console.warn('Failed to geocode profile address', err)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method, addressSource, profileAddress])
 
@@ -529,7 +535,9 @@ const CartPage = () => {
                                     const found = await searchPlaces(val, opts)
                                     setSuggestions(found)
                                     setSelectedSuggestionIdx('')
-                                  } catch { }
+                                  } catch (err) {
+                                    console.warn('Failed to search address suggestions', err)
+                                  }
                                   finally { setSuggestLoading(false) }
                                 }, 300)
                               }}
@@ -555,7 +563,9 @@ const CartPage = () => {
                                     } else {
                                       setShipError('Khong tim thay toa do dia chi nay')
                                     }
-                                  } catch { }
+                                  } catch (err) {
+                                    console.warn('Failed to handle address Enter selection', err)
+                                  }
                                 }
                               }}
                             />

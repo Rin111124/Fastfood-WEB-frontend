@@ -34,6 +34,8 @@ import VietQrCheckout from '../features/customer/pages/VietQrCheckout'
 import StripeCheckout from '../features/customer/pages/StripeCheckout'
 import VnpayCheckout from '../features/customer/pages/VnpayCheckout'
 import PaypalCheckout from '../features/customer/pages/PaypalCheckout'
+import ForgotPassword from '../components/Auth/ForgotPassword'
+import ResetPassword from '../components/Auth/ResetPassword'
 
 const AppRoutes = () => (
   <Routes>
@@ -44,6 +46,8 @@ const AppRoutes = () => (
     <Route path="/cart" element={<CartPage />} />
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
 
     <Route element={<ProtectedRoute allowRoles={['customer', 'staff', 'admin', 'shipper']} />}>
       <Route path="/dashboard" element={<Dashboard />} />

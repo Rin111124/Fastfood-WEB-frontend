@@ -64,7 +64,9 @@ const LandingTopbar = ({
         if (hash) return okPath && (location.hash || '') === `#${hash}`
         return okPath
       }
-    } catch (_) {}
+    } catch (err) {
+      console.warn('Failed to resolve active link', err)
+    }
     return false
   }
 

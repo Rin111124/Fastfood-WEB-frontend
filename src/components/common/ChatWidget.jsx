@@ -114,7 +114,9 @@ const ChatWidget = () => {
       const s = getSocket()
       if (!s?.connected) return
       s.emit('support:typing', { typing: !!typing })
-    } catch {}
+    } catch (err) {
+      console.warn('Failed to emit typing event', err)
+    }
   }
 
   const renderBody = () => {
