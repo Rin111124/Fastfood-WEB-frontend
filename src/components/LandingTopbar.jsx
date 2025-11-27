@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faCartShopping, faMagnifyingGlass, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faHouse, faCartShopping, faMagnifyingGlass, faRightFromBracket, faBowlFood } from '@fortawesome/free-solid-svg-icons'
 import { faCalendarDays, faCircleUser } from '@fortawesome/free-regular-svg-icons'
 import customerApi from '../services/customerApi'
 import { resolveAssetUrl } from '../services/apiClient'
@@ -168,8 +168,9 @@ const LandingTopbar = ({
             <span>Menu</span>
           </button>
         ) : null}
-        <Link className="landing-new__brand navbar-brand" to="/">
-          FatFood
+        <Link className="landing-new__brand navbar-brand d-inline-flex align-items-center gap-2" to="/">
+          <FontAwesomeIcon icon={faBowlFood} beat className="text-warning" />
+          <span>FatFood</span>
         </Link>
       </div>
 
