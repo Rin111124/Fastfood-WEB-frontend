@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { signup } from '../../services/authService'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 const Signup = () => {
   const [form, setForm] = useState({
@@ -23,6 +24,8 @@ const Signup = () => {
   const [fieldErrors, setFieldErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const [captchaToken, setCaptchaToken] = useState('')
+  const siteKey = useMemo(() => (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim(), [])
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target
@@ -151,6 +154,10 @@ const Signup = () => {
       clientErrors.role = 'Vui long chon vai tro'
     }
 
+    if (!captchaToken) {
+      clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA'
+    }
+
     if (Object.keys(clientErrors).length) {
       setFieldErrors(clientErrors)
       setFeedback({
@@ -171,6 +178,7 @@ const Signup = () => {
         phoneNumber: phoneNumberValue,
         gender: form.gender,
         role: form.role,
+        captchaToken,
       })
       const contactName = response?.user?.name ?? fullNameValue
       setFeedback({
@@ -251,14 +259,14 @@ const Signup = () => {
             type="password"
             className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
             placeholder="Create a secure passphrase"
-            minLength={12}
+            minLength={8}
             value={form.password}
             onChange={handleChange}
             required
           />
           {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
           <div className="form-text small text-secondary">
-            Can toi thieu 12 ky tu, gom chu hoa, chu thuong, so va ky tu dac biet.
+            Can toi thieu 8 ky tu, gom chu hoa, so va ky tu dac biet.
           </div>
           </div>
 
@@ -353,6 +361,47 @@ const Signup = () => {
             </select>
             {fieldErrors.role && <div className="invalid-feedback d-block">{fieldErrors.role}</div>}
           </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="form-label" htmlFor="captchaToken">
+            CAPTCHA
+          </label>
+          {siteKey ? (
+            <div className="d-flex flex-column gap-2">
+              <ReCAPTCHA
+                sitekey={siteKey}
+                onChange={(token) => {
+                  setCaptchaToken(token || '')
+                  setFieldErrors((prev) => {
+                    if (!prev.captchaToken) return prev
+                    const next = { ...prev }
+                    delete next.captchaToken
+                    return next
+                  })
+                }}
+                onExpired={() => setCaptchaToken('')}
+              />
+              {fieldErrors.captchaToken && <div className="text-danger small">{fieldErrors.captchaToken}</div>}
+            </div>
+          ) : (
+            <>
+              <input
+                id="captchaToken"
+                name="captchaToken"
+                type="text"
+                className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
+                placeholder="Nhap ma CAPTCHA"
+                value={captchaToken}
+                onChange={(event) => setCaptchaToken(event.target.value)}
+                required
+              />
+              <div className="form-text small text-secondary">
+                Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+              </div>
+              {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
+            </>
+          )}
         </div>
 
         <div className="form-check mt-4">

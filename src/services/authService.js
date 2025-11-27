@@ -122,7 +122,7 @@ const mapRoleForApi = (role) => {
   return ['customer', 'guest', 'staff'].includes(normalized) ? normalized : 'customer'
 }
 
-export const signup = async ({ username, password, fullName, email, phoneNumber, gender, role }) => {
+export const signup = async ({ username, password, fullName, email, phoneNumber, gender, role, captchaToken }) => {
   if (!username || !password || !fullName || !email || !phoneNumber || !gender || !role) {
     throw new Error('All fields are required so we can prep your QuickBite workspace.')
   }
@@ -145,6 +145,7 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
       phoneNumber,
       gender: mapGenderForApi(gender),
       role: mapRoleForApi(role),
+      ...(captchaToken ? { captchaToken } : {}),
     })
     response = result.response
     body = result.body

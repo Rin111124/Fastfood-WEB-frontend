@@ -13,7 +13,7 @@ const Login = () => {
   })
 
   const [captchaToken, setCaptchaToken] = useState('')
-  const [showCaptcha, setShowCaptcha] = useState(false)
+  const [showCaptcha, setShowCaptcha] = useState(true)
   const [feedback, setFeedback] = useState({
     status: 'idle',
     message: '',
