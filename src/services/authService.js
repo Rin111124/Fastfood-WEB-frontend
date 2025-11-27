@@ -130,6 +130,9 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
   if (password.length < 8) {
     throw new Error('Passwords need at least 8 characters.')
   }
+  if (!/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^\w\s]/.test(password)) {
+    throw new Error('Password must include at least one uppercase letter, one number, and one special character.')
+  }
 
   let response
   let body

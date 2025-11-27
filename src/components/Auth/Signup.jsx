@@ -110,6 +110,8 @@ const Signup = () => {
       clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
     } else if (passwordValue.length > 255) {
       clientErrors.password = 'Mat khau khong duoc vuot qua 255 ky tu'
+    } else if (!/[A-Z]/.test(passwordValue) || !/[0-9]/.test(passwordValue) || !/[^\w\s]/.test(passwordValue)) {
+      clientErrors.password = 'Can it nhat 1 chu hoa, 1 so va 1 ky tu dac biet'
     }
 
     if (!fullNameValue) {

@@ -206,7 +206,7 @@ const Login = () => {
           />
           {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
           <div className="form-text small text-secondary">
-            Mat khau can toi thieu 8 ky tu.
+            Mat khau can toi thieu 8 ky tu, nen co chu hoa, so va ky tu dac biet.
           </div>
         </div>
 
