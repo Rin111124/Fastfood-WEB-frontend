@@ -83,7 +83,6 @@ const Signup = () => {
 
     console.log('[Signup] handleSubmit called', { isLoading, submitting: submittingRef.current })
 
-    // Prevent duplicate submissions
     if (isLoading || submittingRef.current) {
       console.log('[Signup] Blocked: already submitting')
       return
@@ -108,9 +107,9 @@ const Signup = () => {
     const emailValue = form.email.trim().toLowerCase()
     const phoneNumberValue = form.phoneNumber.trim()
 
+    // ... (giữ nguyên phần validation) ...
     const clientErrors = {}
 
-    // ... validation code (giữ nguyên) ...
     if (!usernameValue) {
       clientErrors.username = 'Vui long nhap ten dang nhap'
     } else if (usernameValue.length < 3) {
@@ -198,14 +197,11 @@ const Signup = () => {
       })
 
       console.log('[Signup] API response received:', response)
-      console.log('[Signup] Response structure:', JSON.stringify(response, null, 2))
 
-      // FIX: Kiểm tra response có tồn tại không
       if (!response || !response.user) {
         throw new Error('Invalid response from server')
       }
 
-      // Lấy thông tin từ response với fallback
       const contactName = response.user.name || fullNameValue
       const emailText = response.user.email || emailValue
       const verificationUrl = response.emailVerification?.verifyUrl
@@ -218,7 +214,7 @@ const Signup = () => {
         verificationToken
       })
 
-      // Navigate với query params
+      // Navigate to verify email page
       const query = new URLSearchParams()
       if (emailText) query.set('email', emailText)
       if (verificationToken) query.set('token', verificationToken)
@@ -226,7 +222,6 @@ const Signup = () => {
       const navigationPath = `/verify-email${query.toString() ? `?${query.toString()}` : ''}`
       console.log('[Signup] Navigating to:', navigationPath)
 
-      // FIX: Đảm bảo navigate được gọi
       navigate(navigationPath, {
         replace: true,
         state: {
@@ -239,22 +234,47 @@ const Signup = () => {
 
     } catch (error) {
       console.error('[Signup] Error occurred:', error)
-      console.error('[Signup] Error message:', error.message)
-      console.error('[Signup] Field errors:', error.fieldErrors)
-      console.error('[Signup] Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+      console.error('[Signup] Error details:', {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        fieldErrors: error.fieldErrors,
+        requiresVerification: error.requiresVerification
+      })
 
-      // Reset loading state ngay khi có lỗi
+      // Reset loading state
       setIsLoading(false)
       submittingRef.current = false
 
+      // XỬ LÝ LỖI EMAIL_NOT_VERIFIED (409 - user exists but not verified)
+      if (error.code === 'EMAIL_NOT_VERIFIED' || error.requiresVerification) {
+        console.log('[Signup] User exists but not verified, redirecting to verify page')
+
+        // Navigate to verify email page
+        const query = new URLSearchParams()
+        query.set('email', error.email || emailValue)
+        if (error.emailVerification?.token) {
+          query.set('token', error.emailVerification.token)
+        }
+
+        navigate(`/verify-email?${query.toString()}`, {
+          replace: true,
+          state: {
+            email: error.email || emailValue,
+            message: 'Tai khoan da ton tai nhung chua duoc xac thuc. Vui long kiem tra email de xac thuc tai khoan.'
+          }
+        })
+        return
+      }
+
+      // Xử lý lỗi thông thường
       setFeedback({
         status: 'error',
         message: error.message || 'We could not create your account right now. Please try again or contact support.',
       })
+
       setFieldErrors(error.fieldErrors || {})
     }
-    // FIX: Không reset loading state trong finally nếu navigate thành công
-    // finally block đã bị loại bỏ để tránh reset state sau khi navigate
   }
 
   return (

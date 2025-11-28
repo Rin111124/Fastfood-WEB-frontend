@@ -142,48 +142,109 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
     throw new Error('Password must include at least one uppercase letter, one number, and one special character.')
   }
 
+  const payload = {
+    username,
+    password,
+    email,
+    fullName,
+    phoneNumber,
+    gender: mapGenderForApi(gender),
+    role: mapRoleForApi(role),
+    ...(captchaToken ? { captchaToken } : {}),
+  }
+
+  console.log('[authService.signup] Request payload:', {
+    ...payload,
+    password: '***HIDDEN***'
+  })
+
   let response
   let body
   try {
-    console.log('[authService.signup] Calling API with payload')
-    const result = await requestJson('/api/auth/signup', {
-      username,
-      password,
-      email,
-      fullName,
-      phoneNumber,
-      gender: mapGenderForApi(gender),
-      role: mapRoleForApi(role),
-      ...(captchaToken ? { captchaToken } : {}),
-    })
+    console.log('[authService.signup] Calling API /api/auth/signup')
+    const result = await requestJson('/api/auth/signup', payload)
     response = result.response
     body = result.body
-    console.log('[authService.signup] API response received', { status: response.status, body })
+
+    console.log('[authService.signup] Response status:', response.status)
+    console.log('[authService.signup] Response body:', JSON.stringify(body, null, 2))
+
   } catch (networkError) {
-    console.error('[authService.signup] Network error', networkError)
+    console.error('[authService.signup] Network error:', networkError)
     throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
   }
 
+  // ✅ XỬ LÝ RESPONSE STATUS 409 - User exists but not verified
+  if (response.status === 409) {
+    console.log('[authService.signup] Got 409, checking if user needs verification')
+
+    // Kiểm tra xem có phải là trường hợp chưa verify không
+    if (body?.code === 'EMAIL_NOT_VERIFIED' && body?.requiresVerification && body?.data) {
+      console.log('[authService.signup] User exists but not verified, returning verification data')
+
+      // ✅ TRẢ VỀ DATA THAY VÌ THROW ERROR để component có thể navigate
+      const registeredUser = body.data.user
+      return {
+        user: {
+          id: registeredUser.user_id,
+          username: registeredUser.username,
+          email: registeredUser.email,
+          role: registeredUser.role,
+          name: normalizeName(registeredUser.full_name || registeredUser.username, fullName),
+          raw: registeredUser,
+        },
+        requiresEmailVerification: Boolean(body.data.requiresEmailVerification),
+        emailVerification: body.data.emailVerification,
+      }
+    }
+
+    // Lỗi 409 thông thường (username/email đã tồn tại và đã verify)
+    console.error('[authService.signup] 409 conflict - user already exists and verified')
+    const message = body?.message || 'Username or email already exists.'
+    const error = new Error(message)
+    error.status = response.status
+    error.code = body?.code || 'CONFLICT'
+
+    if (body?.errors && typeof body.errors === 'object') {
+      error.fieldErrors = body.errors
+    }
+
+    throw error
+  }
+
+  // Xử lý các status code lỗi khác
   if (!response.ok) {
+    console.error('[authService.signup] API returned error status:', response.status)
+
     const message =
       body?.message ||
       (response.status >= 500
         ? 'We are preparing the signup kitchen tools. Please try again shortly.'
         : 'We could not create your account right now. Please verify your details.')
+
     const error = new Error(message)
+    error.status = response.status
+    error.code = body?.code
+
     if (body?.errors && typeof body.errors === 'object') {
       error.fieldErrors = body.errors
     }
+
     throw error
   }
 
+  // Response thành công (201)
   const data = body?.data
+
+  console.log('[authService.signup] Success! Response data:', data)
+
   if (!data?.user) {
+    console.error('[authService.signup] Missing user data in response')
     throw new Error('Signup response is missing required data. Please contact support.')
   }
 
   const registeredUser = data.user
-  return {
+  const result = {
     user: {
       id: registeredUser.user_id,
       username: registeredUser.username,
@@ -195,8 +256,11 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
     requiresEmailVerification: Boolean(data?.requiresEmailVerification),
     emailVerification: data?.emailVerification,
   }
-}
 
+  console.log('[authService.signup] Returning result:', result)
+
+  return result
+}
 export const requestPasswordReset = async ({ identifier, captchaToken }) => {
   const payload = {
     identifier,
