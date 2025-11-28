@@ -81,12 +81,16 @@ const Signup = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
+    console.log('[Signup] handleSubmit called', { isLoading, submitting: submittingRef.current })
+
     // Prevent duplicate submissions using both state and ref
     if (isLoading || submittingRef.current) {
+      console.log('[Signup] Blocked: already submitting')
       return
     }
 
     if (!form.agree) {
+      console.log('[Signup] Blocked: terms not agreed')
       setFeedback({
         status: 'error',
         message: 'Please acknowledge the QuickBite service terms and kitchen guidelines to continue.',
@@ -94,6 +98,7 @@ const Signup = () => {
       return
     }
 
+    console.log('[Signup] Starting validation and submission')
     setFeedback({ status: 'idle', message: '' })
     setFieldErrors({})
 
@@ -165,6 +170,7 @@ const Signup = () => {
     }
 
     if (Object.keys(clientErrors).length) {
+      console.log('[Signup] Validation failed', clientErrors)
       setFieldErrors(clientErrors)
       setFeedback({
         status: 'error',
@@ -173,10 +179,12 @@ const Signup = () => {
       return
     }
 
+    console.log('[Signup] Validation passed, sending request...')
     setIsLoading(true)
     submittingRef.current = true
 
     try {
+      console.log('[Signup] Calling signup API...')
       const response = await signup({
         username: usernameValue,
         password: passwordValue,
@@ -188,6 +196,8 @@ const Signup = () => {
         captchaToken,
       })
 
+      console.log('[Signup] API response received', response)
+
       const contactName = response?.user?.name ?? fullNameValue
       const emailText = response?.user?.email || emailValue
       const verificationUrl = response?.emailVerification?.verifyUrl
@@ -198,6 +208,7 @@ const Signup = () => {
       if (emailText) query.set('email', emailText)
       if (verificationToken) query.set('token', verificationToken)
 
+      console.log('[Signup] Navigating to verify-email page')
       navigate(`/verify-email${query.toString() ? `?${query.toString()}` : ''}`, {
         replace: true,
         state: {
@@ -206,6 +217,7 @@ const Signup = () => {
         }
       })
     } catch (error) {
+      console.error('[Signup] Error occurred', error)
       setFeedback({
         status: 'error',
         message: error.message || 'We could not create your account right now. Please try again or contact support.',
