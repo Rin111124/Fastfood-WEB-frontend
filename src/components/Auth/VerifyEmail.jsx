@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { resendVerificationEmail, verifyEmail } from '../../services/authService'
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams()
+  const location = useLocation()
   const tokenFromQuery = useMemo(() => (searchParams.get('token') || '').trim(), [searchParams])
   const emailFromQuery = useMemo(() => (searchParams.get('email') || '').trim(), [searchParams])
   const navigate = useNavigate()
@@ -12,7 +13,7 @@ const VerifyEmail = () => {
   const [token, setToken] = useState(tokenFromQuery)
   const [identifier, setIdentifier] = useState(emailFromQuery)
   const [status, setStatus] = useState('idle') // idle | loading | success | error
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(location.state?.message || '')
   const [resendStatus, setResendStatus] = useState({ status: 'idle', message: '' })
 
   const runVerification = async (tokenValue) => {
@@ -103,6 +104,12 @@ const VerifyEmail = () => {
           Dán mã trong email hoặc mở liên kết xác thực để kích hoạt tài khoản của bạn.
         </p>
       </div>
+
+      {message && status === 'idle' && (
+        <div className="alert alert-info border-0" role="alert">
+          {message}
+        </div>
+      )}
 
       {status !== 'idle' && (
         <div

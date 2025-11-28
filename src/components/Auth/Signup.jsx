@@ -180,25 +180,23 @@ const Signup = () => {
         role: form.role,
         captchaToken,
       })
+
       const contactName = response?.user?.name ?? fullNameValue
       const emailText = response?.user?.email || emailValue
       const verificationUrl = response?.emailVerification?.verifyUrl
       const verificationToken = response?.emailVerification?.token
 
-      setFeedback({
-        status: 'success',
-        message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.` +
-          (verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''),
-      })
-      setFieldErrors({})
-
+      // Navigate immediately to prevent duplicate submissions
       const query = new URLSearchParams()
       if (emailText) query.set('email', emailText)
       if (verificationToken) query.set('token', verificationToken)
 
       navigate(`/verify-email${query.toString() ? `?${query.toString()}` : ''}`, {
         replace: true,
-        state: { email: emailText }
+        state: {
+          email: emailText,
+          message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.${verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''}`
+        }
       })
     } catch (error) {
       setFeedback({
@@ -264,21 +262,21 @@ const Signup = () => {
             <label className="form-label" htmlFor="password">
               Password
             </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
-            placeholder="Create a secure passphrase"
-            minLength={8}
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-          {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
-          <div className="form-text small text-secondary">
-            Can toi thieu 8 ky tu, gom chu hoa, so va ky tu dac biet.
-          </div>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
+              placeholder="Create a secure passphrase"
+              minLength={8}
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+            {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
+            <div className="form-text small text-secondary">
+              Can toi thieu 8 ky tu, gom chu hoa, so va ky tu dac biet.
+            </div>
           </div>
 
           <div className="col-12 col-md-6">
@@ -436,9 +434,8 @@ const Signup = () => {
 
         {feedback.status !== 'idle' && (
           <div
-            className={`alert mt-4 mb-0 py-3 px-4 ${
-              feedback.status === 'error' ? 'alert-danger border-0' : 'alert-success border-0'
-            }`}
+            className={`alert mt-4 mb-0 py-3 px-4 ${feedback.status === 'error' ? 'alert-danger border-0' : 'alert-success border-0'
+              }`}
             role="alert"
           >
             {feedback.message}
