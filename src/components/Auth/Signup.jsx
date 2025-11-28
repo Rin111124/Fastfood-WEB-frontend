@@ -183,15 +183,23 @@ const Signup = () => {
       const contactName = response?.user?.name ?? fullNameValue
       const emailText = response?.user?.email || emailValue
       const verificationUrl = response?.emailVerification?.verifyUrl
+      const verificationToken = response?.emailVerification?.token
+
       setFeedback({
         status: 'success',
         message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.` +
           (verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''),
       })
       setFieldErrors({})
-      setTimeout(() => {
-        navigate('/login', { replace: true, state: { username: usernameValue } })
-      }, 1200)
+
+      const query = new URLSearchParams()
+      if (emailText) query.set('email', emailText)
+      if (verificationToken) query.set('token', verificationToken)
+
+      navigate(`/verify-email${query.toString() ? `?${query.toString()}` : ''}`, {
+        replace: true,
+        state: { email: emailText }
+      })
     } catch (error) {
       setFeedback({
         status: 'error',
