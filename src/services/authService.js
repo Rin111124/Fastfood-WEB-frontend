@@ -129,6 +129,8 @@ const mapRoleForApi = (role) => {
 }
 
 export const signup = async ({ username, password, fullName, email, phoneNumber, gender, role, captchaToken }) => {
+  console.log('[authService.signup] Starting signup request', { username, email })
+  
   if (!username || !password || !fullName || !email || !phoneNumber || !gender || !role) {
     throw new Error('All fields are required so we can prep your QuickBite workspace.')
   }
@@ -143,6 +145,7 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
   let response
   let body
   try {
+    console.log('[authService.signup] Calling API with payload')
     const result = await requestJson('/api/auth/signup', {
       username,
       password,
@@ -155,8 +158,9 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
     })
     response = result.response
     body = result.body
+    console.log('[authService.signup] API response received', { status: response.status, body })
   } catch (networkError) {
-    console.error('Signup request failed', networkError)
+    console.error('[authService.signup] Network error', networkError)
     throw new Error('Cannot reach the QuickBite API. Please check your network connection.')
   }
 
