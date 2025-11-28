@@ -130,7 +130,7 @@ const mapRoleForApi = (role) => {
 
 export const signup = async ({ username, password, fullName, email, phoneNumber, gender, role, captchaToken }) => {
   console.log('[authService.signup] Starting signup request', { username, email })
-  
+
   if (!username || !password || !fullName || !email || !phoneNumber || !gender || !role) {
     throw new Error('All fields are required so we can prep your QuickBite workspace.')
   }

@@ -83,7 +83,7 @@ const Signup = () => {
 
     console.log('[Signup] handleSubmit called', { isLoading, submitting: submittingRef.current })
 
-    // Prevent duplicate submissions using both state and ref
+    // Prevent duplicate submissions
     if (isLoading || submittingRef.current) {
       console.log('[Signup] Blocked: already submitting')
       return
@@ -110,6 +110,7 @@ const Signup = () => {
 
     const clientErrors = {}
 
+    // ... validation code (giữ nguyên) ...
     if (!usernameValue) {
       clientErrors.username = 'Vui long nhap ten dang nhap'
     } else if (usernameValue.length < 3) {
@@ -196,37 +197,64 @@ const Signup = () => {
         captchaToken,
       })
 
-      console.log('[Signup] API response received', response)
+      console.log('[Signup] API response received:', response)
+      console.log('[Signup] Response structure:', JSON.stringify(response, null, 2))
 
-      const contactName = response?.user?.name ?? fullNameValue
-      const emailText = response?.user?.email || emailValue
-      const verificationUrl = response?.emailVerification?.verifyUrl
-      const verificationToken = response?.emailVerification?.token
+      // FIX: Kiểm tra response có tồn tại không
+      if (!response || !response.user) {
+        throw new Error('Invalid response from server')
+      }
 
-      // Navigate immediately to prevent duplicate submissions
+      // Lấy thông tin từ response với fallback
+      const contactName = response.user.name || fullNameValue
+      const emailText = response.user.email || emailValue
+      const verificationUrl = response.emailVerification?.verifyUrl
+      const verificationToken = response.emailVerification?.token
+
+      console.log('[Signup] Extracted data:', {
+        contactName,
+        emailText,
+        verificationUrl,
+        verificationToken
+      })
+
+      // Navigate với query params
       const query = new URLSearchParams()
       if (emailText) query.set('email', emailText)
       if (verificationToken) query.set('token', verificationToken)
 
-      console.log('[Signup] Navigating to verify-email page')
-      navigate(`/verify-email${query.toString() ? `?${query.toString()}` : ''}`, {
+      const navigationPath = `/verify-email${query.toString() ? `?${query.toString()}` : ''}`
+      console.log('[Signup] Navigating to:', navigationPath)
+
+      // FIX: Đảm bảo navigate được gọi
+      navigate(navigationPath, {
         replace: true,
         state: {
           email: emailText,
           message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.${verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''}`
         }
       })
+
+      console.log('[Signup] Navigation completed')
+
     } catch (error) {
-      console.error('[Signup] Error occurred', error)
+      console.error('[Signup] Error occurred:', error)
+      console.error('[Signup] Error message:', error.message)
+      console.error('[Signup] Field errors:', error.fieldErrors)
+      console.error('[Signup] Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+
+      // Reset loading state ngay khi có lỗi
+      setIsLoading(false)
+      submittingRef.current = false
+
       setFeedback({
         status: 'error',
         message: error.message || 'We could not create your account right now. Please try again or contact support.',
       })
       setFieldErrors(error.fieldErrors || {})
-    } finally {
-      setIsLoading(false)
-      submittingRef.current = false
     }
+    // FIX: Không reset loading state trong finally nếu navigate thành công
+    // finally block đã bị loại bỏ để tránh reset state sau khi navigate
   }
 
   return (
