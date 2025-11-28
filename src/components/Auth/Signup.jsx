@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import { signup } from '../../services/authService'
@@ -23,6 +23,7 @@ const Signup = () => {
 
   const [fieldErrors, setFieldErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const submittingRef = useRef(false)
   const navigate = useNavigate()
   const [captchaToken, setCaptchaToken] = useState('')
   const siteKey = useMemo(() => (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim(), [])
@@ -79,6 +80,11 @@ const Signup = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+
+    // Prevent duplicate submissions using both state and ref
+    if (isLoading || submittingRef.current) {
+      return
+    }
 
     if (!form.agree) {
       setFeedback({
@@ -168,6 +174,7 @@ const Signup = () => {
     }
 
     setIsLoading(true)
+    submittingRef.current = true
 
     try {
       const response = await signup({
@@ -206,6 +213,7 @@ const Signup = () => {
       setFieldErrors(error.fieldErrors || {})
     } finally {
       setIsLoading(false)
+      submittingRef.current = false
     }
   }
 
