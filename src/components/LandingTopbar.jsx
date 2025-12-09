@@ -28,11 +28,11 @@ const faByKey = {
 const LandingTopbar = ({
   isAuthenticated = false,
   customerName = "Khách hàng",
-  onLogout = () => {},
+  onLogout = () => { },
   navItems = defaultNavItems,
   isSticky = false,
   showSidebarToggle = false,
-  onSidebarToggle = () => {},
+  onSidebarToggle = () => { },
   showNav = true
 }) => {
   const topbarClassName = clsx("landing-new__topbar container navbar navbar-expand-lg rounded-pill shadow-sm", {
@@ -167,7 +167,7 @@ const LandingTopbar = ({
         ) : null}
         <Link className="landing-new__brand navbar-brand d-inline-flex align-items-center gap-2" to="/">
           <FontAwesomeIcon icon={faBowlFood} beat className="text-warning" />
-          <span>FatFood</span>
+          <span>FastFood</span>
         </Link>
       </div>
 
