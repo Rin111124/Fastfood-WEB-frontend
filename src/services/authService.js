@@ -261,6 +261,7 @@ export const signup = async ({ username, password, fullName, email, phoneNumber,
 
   return result
 }
+
 export const requestPasswordReset = async ({ identifier, captchaToken }) => {
   const payload = {
     identifier,

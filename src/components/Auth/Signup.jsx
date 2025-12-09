@@ -25,6 +25,9 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false)
   const submittingRef = useRef(false)
   const navigate = useNavigate()
+  const captchaDisabled =
+    String(import.meta.env.VITE_DISABLE_CAPTCHA || import.meta.env.VITE_DISABLE_LOGIN_CAPTCHA || '').toLowerCase() ===
+    'true'
   const [captchaToken, setCaptchaToken] = useState('')
   const siteKey = useMemo(() => (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim(), [])
 
@@ -165,7 +168,7 @@ const Signup = () => {
       clientErrors.role = 'Vui long chon vai tro'
     }
 
-    if (!captchaToken) {
+    if (!captchaDisabled && !captchaToken) {
       clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA'
     }
 
@@ -193,7 +196,7 @@ const Signup = () => {
         phoneNumber: phoneNumberValue,
         gender: form.gender,
         role: form.role,
-        captchaToken,
+        captchaToken: captchaDisabled ? undefined : captchaToken,
       })
 
       console.log('[Signup] API response received:', response)
@@ -440,46 +443,48 @@ const Signup = () => {
           </div>
         </div>
 
-        <div className="mt-4">
-          <label className="form-label" htmlFor="captchaToken">
-            CAPTCHA
-          </label>
-          {siteKey ? (
-            <div className="d-flex flex-column gap-2">
-              <ReCAPTCHA
-                sitekey={siteKey}
-                onChange={(token) => {
-                  setCaptchaToken(token || '')
-                  setFieldErrors((prev) => {
-                    if (!prev.captchaToken) return prev
-                    const next = { ...prev }
-                    delete next.captchaToken
-                    return next
-                  })
-                }}
-                onExpired={() => setCaptchaToken('')}
-              />
-              {fieldErrors.captchaToken && <div className="text-danger small">{fieldErrors.captchaToken}</div>}
-            </div>
-          ) : (
-            <>
-              <input
-                id="captchaToken"
-                name="captchaToken"
-                type="text"
-                className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
-                placeholder="Nhap ma CAPTCHA"
-                value={captchaToken}
-                onChange={(event) => setCaptchaToken(event.target.value)}
-                required
-              />
-              <div className="form-text small text-secondary">
-                Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+        {!captchaDisabled && (
+          <div className="mt-4">
+            <label className="form-label" htmlFor="captchaToken">
+              CAPTCHA
+            </label>
+            {siteKey ? (
+              <div className="d-flex flex-column gap-2">
+                <ReCAPTCHA
+                  sitekey={siteKey}
+                  onChange={(token) => {
+                    setCaptchaToken(token || '')
+                    setFieldErrors((prev) => {
+                      if (!prev.captchaToken) return prev
+                      const next = { ...prev }
+                      delete next.captchaToken
+                      return next
+                    })
+                  }}
+                  onExpired={() => setCaptchaToken('')}
+                />
+                {fieldErrors.captchaToken && <div className="text-danger small">{fieldErrors.captchaToken}</div>}
               </div>
-              {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <input
+                  id="captchaToken"
+                  name="captchaToken"
+                  type="text"
+                  className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
+                  placeholder="Nhap ma CAPTCHA"
+                  value={captchaToken}
+                  onChange={(event) => setCaptchaToken(event.target.value)}
+                  required
+                />
+                <div className="form-text small text-secondary">
+                  Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+                </div>
+                {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
+              </>
+            )}
+          </div>
+        )}
 
         <div className="form-check mt-4">
           <input

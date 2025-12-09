@@ -10,6 +10,9 @@ const ForgotPassword = () => {
   const [feedback, setFeedback] = useState({ status: 'idle', message: '' })
   const [fieldErrors, setFieldErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const captchaDisabled =
+    String(import.meta.env.VITE_DISABLE_CAPTCHA || import.meta.env.VITE_DISABLE_LOGIN_CAPTCHA || '').toLowerCase() ===
+    'true'
   const siteKey = useMemo(() => (import.meta.env.VITE_RECAPTCHA_SITE_KEY || '').trim(), [])
 
   const validate = () => {
@@ -34,7 +37,10 @@ const ForgotPassword = () => {
     setFieldErrors({})
 
     try {
-      const result = await requestPasswordReset({ identifier: identifier.trim(), captchaToken })
+      const result = await requestPasswordReset({
+        identifier: identifier.trim(),
+        captchaToken: captchaDisabled ? undefined : captchaToken,
+      })
       setFeedback({
         status: 'success',
         message: 'Neu thong tin hop le, email khoi phuc da duoc gui. Vui long kiem tra hop thu (va Spam).',
@@ -104,7 +110,7 @@ const ForgotPassword = () => {
           {fieldErrors.identifier && <div className="invalid-feedback">{fieldErrors.identifier}</div>}
         </div>
 
-        {siteKey && (
+        {!captchaDisabled && siteKey && (
           <div className="mb-4">
             <label className="form-label">CAPTCHA</label>
             <ReCAPTCHA

@@ -1,0 +1,119 @@
+.news-page__hero {
+  padding: 64px 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 203, 107, 0.25), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(255, 132, 124, 0.22), transparent 40%),
+    linear-gradient(120deg, #0f172a, #111827);
+  color: #f8fafc;
+}
+
+.news-page__hero h1 {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.news-page__hero p {
+  color: #e2e8f0;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.news-page__search {
+  border-radius: 999px;
+  padding: 12px 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: none;
+}
+
+.news-page__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+  height: 100%;
+}
+
+.news-page__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+.news-page__image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #f8fafc;
+}
+
+.news-page__content {
+  padding: 16px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.news-page__meta {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.news-page__title {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #0f172a;
+}
+
+.news-page__excerpt {
+  color: #4b5563;
+  margin: 0;
+}
+
+.news-page__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ecfeff;
+  color: #0ea5e9;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.news-detail__media {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8fafc;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.news-detail__header {
+  gap: 12px;
+}
+
+.news-detail__content {
+  color: #1f2937;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.news-detail__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.news-detail__date {
+  color: #6b7280;
+}

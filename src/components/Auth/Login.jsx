@@ -12,8 +12,12 @@ const Login = () => {
     remember: false,
   })
 
+  const captchaDisabled =
+    String(import.meta.env.VITE_DISABLE_CAPTCHA || import.meta.env.VITE_DISABLE_LOGIN_CAPTCHA || '').toLowerCase() ===
+    'true'
+
   const [captchaToken, setCaptchaToken] = useState('')
-  const [showCaptcha, setShowCaptcha] = useState(true)
+  const [showCaptcha, setShowCaptcha] = useState(!captchaDisabled)
   const [feedback, setFeedback] = useState({
     status: 'idle',
     message: '',
@@ -78,7 +82,7 @@ const Login = () => {
       clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
     }
 
-    if (showCaptcha && !captchaToken) {
+    if (!captchaDisabled && showCaptcha && !captchaToken) {
       clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA truoc khi dang nhap'
     }
 
@@ -98,7 +102,7 @@ const Login = () => {
         username: usernameValue,
         password: passwordValue,
         remember: form.remember,
-        captchaToken: showCaptcha ? captchaToken : undefined,
+        captchaToken: !captchaDisabled && showCaptcha ? captchaToken : undefined,
       })
       const crewLead = response?.user?.name ?? 'Team member'
       persistSession(response, form.remember)
@@ -118,7 +122,7 @@ const Login = () => {
       }
       navigate(destination, { replace: true, state: response })
     } catch (error) {
-      if (error.requireCaptcha) {
+      if (error.requireCaptcha && !captchaDisabled) {
         setShowCaptcha(true)
         setCaptchaToken('')
       }
@@ -266,7 +270,7 @@ const Login = () => {
           <span className="small text-secondary">Delivery lanes sync every 30 seconds</span>
         </div>
 
-        {showCaptcha && (
+        {!captchaDisabled && showCaptcha && (
           <div className="mb-4">
             <label className="form-label" htmlFor="captchaToken">
               CAPTCHA

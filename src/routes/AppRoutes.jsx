@@ -11,6 +11,8 @@ import MenuPage from '../components/Menupage'
 import ProductDetailPage from '../components/ProductDetailPage'
 import CartPage from '../components/CartPage'
 import CustomerLanding from '../features/customer/pages/CustomerLanding'
+import NewsList from '../features/public/pages/NewsList'
+import NewsDetail from '../features/public/pages/NewsDetail'
 import AdminDashboard from '../features/admin/pages/AdminDashboard'
 import AdminUsers from '../features/admin/pages/AdminUsers'
 import AdminFoods from '../features/admin/pages/AdminFoods'
@@ -45,6 +47,8 @@ const AppRoutes = () => (
     <Route path="/menu" element={<MenuPage />} />
     <Route path="/menu/:productId" element={<ProductDetailPage />} />
     <Route path="/cart" element={<CartPage />} />
+    <Route path="/news" element={<NewsList />} />
+    <Route path="/news/:newsId" element={<NewsDetail />} />
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
     <Route path="/forgot-password" element={<ForgotPassword />} />

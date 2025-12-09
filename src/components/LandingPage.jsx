@@ -463,6 +463,9 @@ const LandingPage = () => {
               </p>
             </div>
             <div className="landing-new__section-actions">
+              <Link className="landing-new__btn landing-new__btn--ghost" to="/news">
+                Xem tat ca tin tuc
+              </Link>
               <a className="landing-new__link" href="#top">
                 Ve dau trang
               </a>

@@ -54,6 +54,7 @@ export const customerApi = {
     }
     return get(`/api/customer/news${query.toString() ? `?${query.toString()}` : ''}`)
   },
+  getNewsDetail: (newsId) => get(`/api/customer/news/${newsId}`),
   getProfile: () => get('/api/customer/me'),
   updateProfile: (payload) => patch('/api/customer/me', payload),
   listOrders: (params = {}) => {
