@@ -1,12 +1,10 @@
-import PropTypes from 'prop-types'
+﻿import PropTypes from "prop-types"
 
 const LandingAnchorNav = ({ items }) => {
-  if (!Array.isArray(items) || items.length === 0) {
-    return null
-  }
+  if (!Array.isArray(items) || items.length === 0) return null
 
   return (
-    <nav className="landing-anchor-nav" aria-label="Dieu huong nhanh">
+    <nav className="landing-anchor-nav" aria-label="Điều hướng nhanh">
       <ul className="landing-anchor-nav__list">
         {items.map((item) => (
           <li key={item.label} className="landing-anchor-nav__item">

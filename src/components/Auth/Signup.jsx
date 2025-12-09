@@ -95,7 +95,7 @@ const Signup = () => {
       console.log('[Signup] Blocked: terms not agreed')
       setFeedback({
         status: 'error',
-        message: 'Please acknowledge the QuickBite service terms and kitchen guidelines to continue.',
+        message: 'Vui lòng đồng ý điều khoản dịch vụ và hướng dẫn vận hành để tiếp tục.',
       })
       return
     }
@@ -114,62 +114,62 @@ const Signup = () => {
     const clientErrors = {}
 
     if (!usernameValue) {
-      clientErrors.username = 'Vui long nhap ten dang nhap'
+      clientErrors.username = 'Vui lòng nhập tên đăng nhập'
     } else if (usernameValue.length < 3) {
-      clientErrors.username = 'Ten dang nhap phai co it nhat 3 ky tu'
+      clientErrors.username = 'Tên đăng nhập phải có ít nhất 3 ký tự'
     } else if (usernameValue.length > 100) {
-      clientErrors.username = 'Ten dang nhap khong duoc vuot qua 100 ky tu'
+      clientErrors.username = 'Tên đăng nhập không được vượt quá 100 ký tự'
     }
 
     if (!passwordValue) {
-      clientErrors.password = 'Vui long nhap mat khau'
+      clientErrors.password = 'Vui lòng nhập mật khẩu'
     } else if (passwordValue.length < 8) {
-      clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
+      clientErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
     } else if (passwordValue.length > 255) {
-      clientErrors.password = 'Mat khau khong duoc vuot qua 255 ky tu'
+      clientErrors.password = 'Mật khẩu không được vượt quá 255 ký tự'
     } else if (!/[A-Z]/.test(passwordValue) || !/[0-9]/.test(passwordValue) || !/[^\w\s]/.test(passwordValue)) {
-      clientErrors.password = 'Can it nhat 1 chu hoa, 1 so va 1 ky tu dac biet'
+      clientErrors.password = 'Cần ít nhất 1 chữ hoa, 1 số và 1 ký tự đặc biệt'
     }
 
     if (!fullNameValue) {
-      clientErrors.fullName = 'Vui long nhap ho ten day du'
+      clientErrors.fullName = 'Vui lòng nhập họ tên đầy đủ'
     } else if (fullNameValue.length < 2) {
-      clientErrors.fullName = 'Ho ten phai co it nhat 2 ky tu'
+      clientErrors.fullName = 'Họ tên phải có ít nhất 2 ký tự'
     } else if (fullNameValue.length > 120) {
-      clientErrors.fullName = 'Ho ten khong duoc vuot qua 120 ky tu'
+      clientErrors.fullName = 'Họ tên không được vượt quá 120 ký tự'
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailValue) {
-      clientErrors.email = 'Email khong hop le'
+      clientErrors.email = 'Email không hợp lệ'
     } else if (emailValue.length > 150) {
-      clientErrors.email = 'Email khong duoc vuot qua 150 ky tu'
+      clientErrors.email = 'Email không được vượt quá 150 ký tự'
     } else if (!emailRegex.test(emailValue)) {
-      clientErrors.email = 'Email khong hop le'
+      clientErrors.email = 'Email không hợp lệ'
     }
 
     const phonePattern = /^[0-9+\-()\s]+$/
     const phoneDigits = phoneNumberValue.replace(/\D/g, '')
     if (!phoneNumberValue) {
-      clientErrors.phoneNumber = 'Vui long nhap so dien thoai'
+      clientErrors.phoneNumber = 'Vui lòng nhập số điện thoại'
     } else if (phoneDigits.length < 8 || phoneDigits.length > 20) {
-      clientErrors.phoneNumber = 'So dien thoai phai co tu 8 den 20 chu so'
+      clientErrors.phoneNumber = 'Số điện thoại phải có từ 8 đến 20 chữ số'
     } else if (!phonePattern.test(phoneNumberValue)) {
-      clientErrors.phoneNumber = 'So dien thoai khong hop le'
+      clientErrors.phoneNumber = 'Số điện thoại không hợp lệ'
     } else if (phoneNumberValue.length > 20) {
-      clientErrors.phoneNumber = 'So dien thoai khong duoc vuot qua 20 ky tu'
+      clientErrors.phoneNumber = 'Số điện thoại không được vượt quá 20 ký tự'
     }
 
     if (!form.gender) {
-      clientErrors.gender = 'Vui long chon gioi tinh'
+      clientErrors.gender = 'Vui lòng chọn giới tính'
     }
 
     if (!form.role) {
-      clientErrors.role = 'Vui long chon vai tro'
+      clientErrors.role = 'Vui lòng chọn vai trò'
     }
 
     if (!captchaDisabled && !captchaToken) {
-      clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA'
+      clientErrors.captchaToken = 'Vui lòng hoàn thành CAPTCHA'
     }
 
     if (Object.keys(clientErrors).length) {
@@ -177,7 +177,7 @@ const Signup = () => {
       setFieldErrors(clientErrors)
       setFeedback({
         status: 'error',
-        message: 'Please correct the highlighted fields to continue.',
+        message: 'Vui lòng kiểm tra và sửa các trường được đánh dấu để tiếp tục.',
       })
       return
     }
@@ -229,7 +229,7 @@ const Signup = () => {
         replace: true,
         state: {
           email: emailText,
-          message: `Dang ky thanh cong, ${contactName}. Vui long kiem tra ${emailText} de xac thuc tai khoan.${verificationUrl ? ` (Lien ket thu nghiem: ${verificationUrl})` : ''}`
+          message: `Đăng ký thành công, ${contactName}. Vui lòng kiểm tra ${emailText} để xác thực tài khoản.${verificationUrl ? ` (Liên kết thử nghiệm: ${verificationUrl})` : ''}`
         }
       })
 
@@ -264,7 +264,7 @@ const Signup = () => {
           replace: true,
           state: {
             email: error.email || emailValue,
-            message: 'Tai khoan da ton tai nhung chua duoc xac thuc. Vui long kiem tra email de xac thuc tai khoan.'
+            message: 'Tài khoản đã tồn tại nhưng chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản.'
           }
         })
         return
@@ -273,7 +273,7 @@ const Signup = () => {
       // Xử lý lỗi thông thường
       setFeedback({
         status: 'error',
-        message: error.message || 'We could not create your account right now. Please try again or contact support.',
+        message: error.message || 'Không thể tạo tài khoản lúc này. Vui lòng thử lại hoặc liên hệ hỗ trợ.',
       })
 
       setFieldErrors(error.fieldErrors || {})
@@ -285,28 +285,28 @@ const Signup = () => {
       brand={{
         name: 'QuickBite Hub',
         abbreviation: 'QB',
-        tagline: 'Fast food, faster ops.',
+        tagline: 'Fast food, vận hành nhanh hơn.',
       }}
       side={{
-        badge: 'Store Launch Suite',
-        title: 'Spin up a new counter without missing a beat',
+        badge: 'Bộ công cụ mở cửa hàng',
+        title: 'Mở quầy mới mà không bỏ lỡ nhịp nào',
         description:
-          'Coordinate kitchen staffing, delivery menus, and promotional bundles from one playbook designed for fast casual teams.',
+          'Điều phối nhân sự bếp, menu giao hàng và gói khuyến mãi từ một “playbook” dành riêng cho fast food.',
         highlights: [
-          'Menu sync to kiosks, apps, and delivery partners in real time',
-          'Prep projections auto-adjusted from historical rush data',
-          'Staff scheduling, training, and food safety checklists in one view',
+          'Đồng bộ menu tới kiosk, app và đối tác giao hàng theo thời gian thực',
+          'Dự báo chuẩn bị tự điều chỉnh từ dữ liệu giờ cao điểm',
+          'Lịch ca, đào tạo và checklist an toàn thực phẩm trong một màn hình',
         ],
-        footnote: 'Join more than 4,000 storefronts staying under 4-minute ticket times with QuickBite.',
+        footnote: 'Hơn 4.000 cửa hàng giữ thời gian ra món dưới 4 phút cùng QuickBite.',
       }}
     >
       <div className="mb-5 text-center text-lg-start">
         <span className="badge rounded-pill bg-light text-primary fw-semibold text-uppercase mb-3">
-          New location
+          Địa điểm mới
         </span>
-        <h1 className="h2 fw-semibold mb-2">Create your operator account</h1>
+        <h1 className="h2 fw-semibold mb-2">Tạo tài khoản vận hành</h1>
         <p className="text-secondary mb-0">
-          Register to access launch checklists, supply forecasts, and delivery dashboards tailored for your region.
+          Đăng ký để dùng checklist khai trương, dự báo nguyên liệu và bảng điều khiển giao hàng theo khu vực.
         </p>
       </div>
 
@@ -314,14 +314,14 @@ const Signup = () => {
         <div className="row g-4">
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="username">
-              Username
-            </label>
+            Tên đăng nhập
+          </label>
             <input
               id="username"
               name="username"
               type="text"
               className={`form-control${fieldErrors.username ? ' is-invalid' : ''}`}
-              placeholder="store.manager"
+              placeholder="nhap.ten.dang.nhap"
               value={form.username}
               onChange={handleChange}
               required
@@ -331,14 +331,14 @@ const Signup = () => {
 
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="password">
-              Password
+              Mật khẩu
             </label>
             <input
               id="password"
               name="password"
               type="password"
               className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
-              placeholder="Create a secure passphrase"
+              placeholder="Nhập mật khẩu mạnh"
               minLength={8}
               value={form.password}
               onChange={handleChange}
@@ -346,20 +346,20 @@ const Signup = () => {
             />
             {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
             <div className="form-text small text-secondary">
-              Can toi thieu 8 ky tu, gom chu hoa, so va ky tu dac biet.
+              Tối thiểu 8 ký tự, gồm chữ hoa, số và ký tự đặc biệt.
             </div>
           </div>
 
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="fullName">
-              Full name
+              Họ và tên
             </label>
             <input
               id="fullName"
               name="fullName"
               type="text"
               className={`form-control${fieldErrors.fullName ? ' is-invalid' : ''}`}
-              placeholder="Nguyen Thi Anh"
+              placeholder="Nguyễn Thị Ánh"
               value={form.fullName}
               onChange={handleChange}
               required
@@ -369,14 +369,14 @@ const Signup = () => {
 
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="email">
-              Work email
+              Email
             </label>
             <input
               id="email"
               name="email"
               type="email"
               className={`form-control${fieldErrors.email ? ' is-invalid' : ''}`}
-              placeholder="you@quickbitepartners.com"
+              placeholder="ban@example.com"
               value={form.email}
               onChange={handleChange}
               required
@@ -386,7 +386,7 @@ const Signup = () => {
 
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="phoneNumber">
-              Phone number
+              Số điện thoại
             </label>
             <input
               id="phoneNumber"
@@ -403,7 +403,7 @@ const Signup = () => {
 
           <div className="col-12 col-md-6">
             <label className="form-label" htmlFor="gender">
-              Gender
+              Giới tính
             </label>
             <select
               id="gender"
@@ -414,19 +414,19 @@ const Signup = () => {
               required
             >
               <option value="" disabled>
-                Select gender
+                Chọn giới tính
               </option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="non-binary">Non-binary</option>
-              <option value="prefer-not">Prefer not to say</option>
+              <option value="female">Nữ</option>
+              <option value="male">Nam</option>
+              <option value="non-binary">Khác</option>
+              <option value="prefer-not">Không muốn tiết lộ</option>
             </select>
             {fieldErrors.gender && <div className="invalid-feedback d-block">{fieldErrors.gender}</div>}
           </div>
 
           <div className="col-12">
             <label className="form-label" htmlFor="role">
-              Access level
+              Vai trò
             </label>
             <select
               id="role"
@@ -436,8 +436,8 @@ const Signup = () => {
               onChange={handleChange}
               required
             >
-              <option value="customer">Customer</option>
-              <option value="guest">Guest</option>
+              <option value="customer">Khách hàng</option>
+              <option value="guest">Khách</option>
             </select>
             {fieldErrors.role && <div className="invalid-feedback d-block">{fieldErrors.role}</div>}
           </div>
@@ -472,13 +472,13 @@ const Signup = () => {
                   name="captchaToken"
                   type="text"
                   className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
-                  placeholder="Nhap ma CAPTCHA"
+                  placeholder="Nhập mã CAPTCHA"
                   value={captchaToken}
                   onChange={(event) => setCaptchaToken(event.target.value)}
                   required
                 />
                 <div className="form-text small text-secondary">
-                  Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+                  Máy chủ yêu cầu CAPTCHA. Nhập mã từ công cụ CAPTCHA của bạn (cấu hình site key để hiển thị widget).
                 </div>
                 {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
               </>
@@ -497,11 +497,11 @@ const Signup = () => {
             required
           />
           <label className="form-check-label ms-2 small" htmlFor="agree">
-            I agree to the{' '}
+            Tôi đồng ý với{' '}
             <button type="button" className="btn btn-link p-0 align-baseline auth-link fw-semibold">
-              QuickBite service terms
+              điều khoản dịch vụ QuickBite
             </button>{' '}
-            and kitchen operations guidelines.
+            và hướng dẫn vận hành bếp.
           </label>
         </div>
 
@@ -517,18 +517,18 @@ const Signup = () => {
 
         <div className="d-grid gap-3 mt-4">
           <button type="submit" className="btn btn-primary" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Create account'}
+            {isLoading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản'}
           </button>
           <button type="button" className="btn btn-outline-secondary">
-            Import team from Google Workspace
+            Nhập danh sách từ Google Workspace
           </button>
         </div>
       </form>
 
       <p className="text-secondary text-center mt-5 mb-0">
-        Already have a QuickBite login?{' '}
+        Đã có tài khoản QuickBite?{' '}
         <Link className="auth-link fw-semibold" to="/login">
-          Sign in instead
+          Đăng nhập
         </Link>
       </p>
     </AuthLayout>

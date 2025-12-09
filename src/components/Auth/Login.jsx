@@ -72,25 +72,25 @@ const Login = () => {
     const clientErrors = {}
 
     if (!usernameValue) {
-      clientErrors.username = 'Vui long nhap ten dang nhap'
-      clientErrors.identifier = 'Vui long nhap ten dang nhap'
+      clientErrors.username = 'Vui lòng nhập tên đăng nhập'
+      clientErrors.identifier = 'Vui lòng nhập tên đăng nhập'
     }
 
     if (!passwordValue) {
-      clientErrors.password = 'Vui long nhap mat khau'
+      clientErrors.password = 'Vui lòng nhập mật khẩu'
     } else if (passwordValue.length < 8) {
-      clientErrors.password = 'Mat khau phai co it nhat 8 ky tu'
+      clientErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
     }
 
     if (!captchaDisabled && showCaptcha && !captchaToken) {
-      clientErrors.captchaToken = 'Vui long hoan thanh CAPTCHA truoc khi dang nhap'
+      clientErrors.captchaToken = 'Vui lòng hoàn thành CAPTCHA trước khi đăng nhập'
     }
 
     if (Object.keys(clientErrors).length) {
       setFieldErrors(clientErrors)
       setFeedback({
         status: 'error',
-        message: 'Please correct the highlighted fields to continue.',
+        message: 'Vui lòng kiểm tra và sửa các trường được đánh dấu để tiếp tục.',
       })
       return
     }
@@ -108,7 +108,7 @@ const Login = () => {
       persistSession(response, form.remember)
       setFeedback({
         status: 'success',
-        message: `${crewLead}, your QuickBite station is online. Orders and prep timers are synced.`,
+        message: `${crewLead}, trạm QuickBite của bạn đã sẵn sàng. Đơn và bộ đếm thời gian chuẩn bị đã đồng bộ.`,
       })
       setFieldErrors({})
       const role = response?.user?.role
@@ -128,7 +128,7 @@ const Login = () => {
       }
 
       if (error.emailNotVerified) {
-        setVerificationNotice('Tai khoan chua duoc xac thuc email. Kiem tra hop thu hoac gui lai lien ket xac thuc.')
+        setVerificationNotice('Tài khoản chưa được xác thực email. Kiểm tra hộp thư hoặc gửi lại liên kết xác thực.')
       } else {
         setVerificationNotice('')
       }
@@ -138,7 +138,7 @@ const Login = () => {
         message:
           error.retryAfterSeconds && error.retryAfterSeconds > 0
             ? `${error.message} (Thu lai sau ${Math.ceil(error.retryAfterSeconds)} giay)`
-            : error.message || 'Unable to sign in right now. Please double-check your username and password.',
+            : error.message || 'Không thể đăng nhập lúc này. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu.',
       })
       setFieldErrors(error.fieldErrors || {})
     } finally {
@@ -151,26 +151,26 @@ const Login = () => {
     if (!identifier) {
       setResendStatus({
         status: 'error',
-        message: 'Nhap email hoac ten dang nhap de gui lai lien ket xac thuc.',
+        message: 'Nhập email hoặc tên đăng nhập để gửi lại liên kết xác thực.',
       })
       return
     }
 
-    setResendStatus({ status: 'loading', message: 'Dang gui lai email xac thuc...' })
+    setResendStatus({ status: 'loading', message: 'Đang gửi lại email xác thực...' })
     try {
       await resendVerificationEmail({ identifier })
       setResendStatus({
         status: 'success',
-        message: 'Neu thong tin hop le, chung toi da gui lai email xac thuc.',
+        message: 'Nếu thông tin hợp lệ, chúng tôi đã gửi lại email xác thực.',
       })
     } catch (error) {
       const retryText =
         typeof error.retryAfterSeconds === 'number' && error.retryAfterSeconds > 0
-          ? ` Thu lai sau ${Math.ceil(error.retryAfterSeconds)} giay.`
+          ? ` Thử lại sau ${Math.ceil(error.retryAfterSeconds)} giây.`
           : ''
       setResendStatus({
         status: 'error',
-        message: `${error.message || 'Khong the gui lai email xac thuc.'}${retryText}`,
+        message: `${error.message || 'Không thể gửi lại email xác thực.'}${retryText}`,
       })
     }
   }
@@ -180,42 +180,42 @@ const Login = () => {
       brand={{
         name: 'QuickBite Hub',
         abbreviation: 'QB',
-        tagline: 'Fast food, faster ops.',
+        tagline: 'Fast food, vận hành nhanh hơn.',
       }}
       side={{
-        badge: 'Kitchen Command Center',
-        title: 'Keep every order crisp, hot, and on time',
+        badge: 'Trung tâm điều hành bếp',
+        title: 'Giữ mọi đơn nóng giòn và đúng giờ',
         description:
-          'Track fryer timers, delivery drivers, and dine-in demand from a single dashboard purpose-built for fast food franchises.',
+          'Theo dõi chiên/rán, giao hàng và khách tại chỗ từ một bảng điều khiển dành riêng cho chuỗi fast food.',
         highlights: [
-          'Real-time order queue with prep-time targeting',
-          'Smart restock alerts for buns, sauces, and sides',
-          'Delivery partner sync with minute-by-minute ETAs',
+          'Hàng đợi đơn thời gian thực với ước tính chuẩn bị',
+          'Cảnh báo nhập kho thông minh cho bánh, sốt và đồ ăn kèm',
+          'Đồng bộ đối tác giao hàng với ETA từng phút',
         ],
-        footnote: 'Average service time drops 22% when teams log in before the lunch rush.',
+        footnote: 'Thời gian phục vụ giảm trung bình 22% khi đội ngũ đăng nhập trước giờ cao điểm.',
       }}
     >
       <div className="mb-5 text-center text-lg-start">
         <span className="badge rounded-pill bg-light text-primary fw-semibold text-uppercase mb-3">
-          Shift ready
+          Sẵn sàng ca làm
         </span>
-        <h1 className="h2 fw-semibold mb-2">Log in to fire up the line</h1>
+        <h1 className="h2 fw-semibold mb-2">Đăng nhập để khởi động dây chuyền</h1>
         <p className="text-secondary mb-0">
-          Review overnight performance, confirm staffing, and prep digital menus before the first guest arrives.
+          Xem hiệu suất qua đêm, xác nhận ca trực và chuẩn bị menu số trước khi khách đầu tiên tới.
         </p>
       </div>
 
       <form className="w-100" onSubmit={handleSubmit} noValidate>
         <div className="mb-4">
           <label className="form-label" htmlFor="loginUsername">
-            Username
+            Tên đăng nhập
           </label>
           <input
             id="loginUsername"
             name="username"
             type="text"
             className={`form-control${fieldErrors.username || fieldErrors.identifier ? ' is-invalid' : ''}`}
-            placeholder="crew.lead"
+            placeholder="nhap.ten.dang.nhap"
             value={form.username}
             onChange={handleChange}
             required
@@ -230,10 +230,10 @@ const Login = () => {
         <div className="mb-4">
           <div className="d-flex justify-content-between align-items-center">
             <label className="form-label mb-0" htmlFor="loginPassword">
-              Password
+              Mật khẩu
             </label>
             <Link to="/forgot-password" className="btn btn-link p-0 auth-link fw-semibold">
-              Reset access
+              Quên mật khẩu
             </Link>
           </div>
           <input
@@ -241,7 +241,7 @@ const Login = () => {
             name="password"
             type="password"
             className={`form-control${fieldErrors.password ? ' is-invalid' : ''}`}
-            placeholder="Enter your kitchen passcode"
+            placeholder="Nhập mật khẩu"
             value={form.password}
             onChange={handleChange}
             required
@@ -249,7 +249,7 @@ const Login = () => {
           />
           {fieldErrors.password && <div className="invalid-feedback">{fieldErrors.password}</div>}
           <div className="form-text small text-secondary">
-            Mat khau can toi thieu 8 ky tu, nen co chu hoa, so va ky tu dac biet.
+            Mật khẩu cần tối thiểu 8 ký tự, nên có chữ hoa, số và ký tự đặc biệt.
           </div>
         </div>
 
@@ -264,10 +264,10 @@ const Login = () => {
               onChange={handleChange}
             />
             <label className="form-check-label ms-2 small" htmlFor="remember">
-              Keep me signed in for rapid reorders
+              Ghi nhớ đăng nhập để đặt lại nhanh
             </label>
           </div>
-          <span className="small text-secondary">Delivery lanes sync every 30 seconds</span>
+          <span className="small text-secondary">Đồng bộ trạng thái mỗi 30 giây</span>
         </div>
 
         {!captchaDisabled && showCaptcha && (
@@ -299,13 +299,13 @@ const Login = () => {
                   name="captchaToken"
                   type="text"
                   className={`form-control${fieldErrors.captchaToken ? ' is-invalid' : ''}`}
-                  placeholder="Nhap ma CAPTCHA"
+                  placeholder="Nhập mã CAPTCHA"
                   value={captchaToken}
                   onChange={(event) => setCaptchaToken(event.target.value)}
                   required
                 />
                 <div className="form-text small text-secondary">
-                  Server yeu cau CAPTCHA. Nhap token tu cong cu CAPTCHA cua ban (cau hinh site key de hien widget).
+                  Máy chủ yêu cầu CAPTCHA. Nhập mã từ công cụ CAPTCHA của bạn (cấu hình site key để hiển thị widget).
                 </div>
                 {fieldErrors.captchaToken && <div className="invalid-feedback d-block">{fieldErrors.captchaToken}</div>}
               </>
@@ -334,10 +334,10 @@ const Login = () => {
                   onClick={handleResendVerification}
                   disabled={resendStatus.status === 'loading'}
                 >
-                  {resendStatus.status === 'loading' ? 'Dang gui...' : 'Gui lai email xac thuc'}
+            {resendStatus.status === 'loading' ? 'Đang gửi...' : 'Gửi lại email xác thực'}
                 </button>
                 <Link className="btn btn-link btn-sm p-0 align-baseline" to="/verify-email">
-                  Nhap ma xac thuc thu cong
+                  Nhập mã xác thực thủ công
                 </Link>
               </div>
               {resendStatus.message && (
@@ -351,7 +351,7 @@ const Login = () => {
 
         <div className="d-grid gap-3">
           <button type="submit" className="btn btn-primary" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
           <button type="button" className="btn btn-outline-secondary">
             <span className="me-2" aria-hidden="true">
@@ -380,15 +380,15 @@ const Login = () => {
                 />
               </svg>
             </span>
-            Sign in with Google
+            Đăng nhập với Google
           </button>
         </div>
       </form>
 
       <p className="text-secondary text-center mt-5 mb-0">
-        Need an account for a new outlet?{' '}
+        Cần tài khoản cho cửa hàng mới?{' '}
         <Link className="auth-link fw-semibold" to="/signup">
-          Start a franchise seat
+          Đăng ký ngay
         </Link>
       </p>
     </AuthLayout>
