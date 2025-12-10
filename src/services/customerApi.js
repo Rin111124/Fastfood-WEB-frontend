@@ -75,6 +75,7 @@ export const customerApi = {
   createPaypalPayment: (payload = {}) => post('/api/payments/paypal/create', payload),
   createStripePaymentIntent: (payload = {}) => post('/api/payments/stripe/create-intent', payload),
   finalizeStripePayment: (payload = {}) => post('/api/payments/stripe/finalize', payload),
+  finalizeStripePaymentFallback: (payload = {}) => post('/api/payments/stripe/finalize-fallback', payload),
   // cart
   getCart: () => get('/api/customer/cart'),
   addToCart: ({ productId, quantity } = {}) => post('/api/customer/cart/items', { productId, quantity }),

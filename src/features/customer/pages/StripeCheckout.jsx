@@ -19,35 +19,48 @@ const StripeCheckoutForm = ({ amount, currency, navigateTo }) => {
     setMessage('')
     setSubmitting(true)
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {},
-      redirect: 'if_required'
-    })
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {},
+        redirect: 'if_required'
+      })
 
-    if (error) {
-      setMessage(error.message || 'Khong the thuc hien thanh toan.')
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      try {
-        await customerApi.finalizeStripePayment({ paymentIntentId: paymentIntent.id })
-      } catch (apiError) {
-        console.error('Finalize Stripe payment failed', apiError)
-        setMessage(
-          apiError?.message ||
-          'Thanh toan thanh cong, dang cap nhat trang thai don hang...'
-        )
+      if (error) {
+        setMessage(error.message || 'Khong the thuc hien thanh toan.')
         setSubmitting(false)
         return
+      }
+
+      if (!paymentIntent || !paymentIntent.id) {
+        setMessage('Khong nhan duoc ID giao dich tu Stripe.')
+        setSubmitting(false)
+        return
+      }
+
+      // Finalize payment - update to success/paid status
+      setMessage('Dang xac nhan thanh toan...')
+      try {
+        await customerApi.finalizeStripePayment({ paymentIntentId: paymentIntent.id })
+      } catch (authError) {
+        // If auth fails, try fallback endpoint
+        console.warn('Auth error on finalize, trying fallback:', authError)
+        await customerApi.finalizeStripePaymentFallback({ paymentIntentId: paymentIntent.id })
       }
 
       setMessage('Thanh toan thanh cong. Dang chuyen ve trang don hang...')
       setTimeout(() => {
         navigateTo('/customer', { replace: true })
       }, 1500)
-    } else {
-      setMessage('Dang cho he thong xac nhan thanh toan...')
+    } catch (apiError) {
+      console.error('Payment finalization failed:', apiError)
+      setMessage(
+        apiError?.message ||
+        'Thanh toan khong the hoan tat. Vui long thu lai hoac lien he ho tro.'
+      )
+    } finally {
+      setSubmitting(false)
     }
-    setSubmitting(false)
   }
 
   return (
