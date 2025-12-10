@@ -74,6 +74,7 @@ export const customerApi = {
   queryVietqrPayment: (orderId) => post('/api/payments/vietqr/query', { orderId }),
   createPaypalPayment: (payload = {}) => post('/api/payments/paypal/create', payload),
   createStripePaymentIntent: (payload = {}) => post('/api/payments/stripe/create-intent', payload),
+  finalizeStripePayment: (payload = {}) => post('/api/payments/stripe/finalize', payload),
   // cart
   getCart: () => get('/api/customer/cart'),
   addToCart: ({ productId, quantity } = {}) => post('/api/customer/cart/items', { productId, quantity }),

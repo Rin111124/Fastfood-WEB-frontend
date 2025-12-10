@@ -28,6 +28,18 @@ const StripeCheckoutForm = ({ amount, currency, navigateTo }) => {
     if (error) {
       setMessage(error.message || 'Khong the thuc hien thanh toan.')
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      try {
+        await customerApi.finalizeStripePayment({ paymentIntentId: paymentIntent.id })
+      } catch (apiError) {
+        console.error('Finalize Stripe payment failed', apiError)
+        setMessage(
+          apiError?.message ||
+          'Thanh toan thanh cong, dang cap nhat trang thai don hang...'
+        )
+        setSubmitting(false)
+        return
+      }
+
       setMessage('Thanh toan thanh cong. Dang chuyen ve trang don hang...')
       setTimeout(() => {
         navigateTo('/customer', { replace: true })
